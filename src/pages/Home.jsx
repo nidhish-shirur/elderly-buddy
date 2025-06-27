@@ -135,15 +135,24 @@ const WeatherBox = styled(Paper)(({ theme }) => ({
     flex: 1
   },
   '& .weather-temp': {
-    fontSize: '24px',
+    fontSize: '28px',
     fontWeight: 600,
     color: '#2C3E50',
-    lineHeight: 1.2
+    lineHeight: 1.2,
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: '4px'
   },
-  '& .weather-condition': {
-    fontSize: '14px',
+  '& .weather-unit': {
+    fontSize: '16px',
     fontWeight: 500,
     color: '#1976D2'
+  },
+  '& .weather-condition': {
+    fontSize: '16px',
+    fontWeight: 500,
+    color: '#1976D2',
+    marginTop: '4px'
   },
   '& .weather-location': {
     fontSize: '14px',
@@ -151,7 +160,7 @@ const WeatherBox = styled(Paper)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
-    marginTop: '2px',
+    marginTop: '4px',
     '& .MuiSvgIcon-root': {
       fontSize: '14px',
       color: '#666'
@@ -176,6 +185,13 @@ const WeatherBox = styled(Paper)(({ theme }) => ({
     color: '#2C3E50',
     fontWeight: 500,
     lineHeight: 1.4
+  },
+  '& .last-updated': {
+    fontSize: '12px',
+    color: '#666',
+    marginTop: '8px',
+    textAlign: 'right',
+    fontStyle: 'italic'
   }
 }));
 
@@ -546,6 +562,7 @@ const Home = () => {
   const [currentQuote, setCurrentQuote] = useState('');
   const [medicationReminders, setMedicationReminders] = useState([]);
   const [routineReminders, setRoutineReminders] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -570,7 +587,7 @@ const Home = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://api.weatherapi.com/v1/current.json?key=4c2b6a2ce113429da6234648252506&q=auto:ip&aqi=no`
+          `https://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=auto:ip&aqi=no`
         );
         
         if (!response.ok) {
@@ -579,6 +596,7 @@ const Home = () => {
 
         const data = await response.json();
         setWeather(data);
+        setLastUpdated(new Date());
         setError(null);
       } catch (err) {
         console.error('Error fetching weather:', err);
@@ -589,8 +607,8 @@ const Home = () => {
     };
 
     fetchWeather();
-    // Refresh weather data every 30 minutes
-    const interval = setInterval(fetchWeather, 1800000);
+    // Refresh weather data every 5 minutes
+    const interval = setInterval(fetchWeather, 300000);
 
     return () => clearInterval(interval);
   }, []);
@@ -825,7 +843,8 @@ const Home = () => {
                     </Box>
                     <Box className="weather-info">
                       <Typography className="weather-temp">
-                        {Math.round(weather.current.temp_c)}°
+                        {Math.round(weather.current.temp_c)}
+                        <span className="weather-unit">°C</span>
                       </Typography>
                       <Typography className="weather-condition">
                         {weather.current.condition.text}
@@ -836,7 +855,7 @@ const Home = () => {
                     </Box>
                     <Box sx={{ ml: 'auto', alignSelf: 'flex-start' }}>
                       <SpeechButton 
-                        text={`The current temperature in ${weather.location.name} is ${Math.round(weather.current.temp_c)} degrees with ${weather.current.condition.text}. ${getWeatherTip(weather.current.condition.text, weather.current.temp_c)}`}
+                        text={`The current temperature in ${weather.location.name} is ${Math.round(weather.current.temp_c)} degrees Celsius with ${weather.current.condition.text}. ${getWeatherTip(weather.current.condition.text, weather.current.temp_c)}`}
                         tooltipText="Listen to weather details and tip"
                         size="small"
                       />
@@ -850,6 +869,10 @@ const Home = () => {
                     {getWeatherTip(weather.current.condition.text, weather.current.temp_c)}
                   </Typography>
                 </Box>
+
+                <Typography className="last-updated">
+                  Last updated: {lastUpdated.toLocaleTimeString()}
+                </Typography>
               </>
             )}
           </WeatherBox>
