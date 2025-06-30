@@ -14,114 +14,166 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useNavigate } from 'react-router-dom';
 
-const PageContainer = styled(Box)({
-  maxWidth: '800px',
-  margin: '0 auto',
-  backgroundColor: '#F5F5F5',
+const PageContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
   minHeight: '100vh',
-  position: 'relative',
-});
+  backgroundColor: '#F5F5F5',
+  padding: '16px',
+  boxSizing: 'border-box',
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px',
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+}));
 
-const Header = styled(Box)({
+const Header = styled(Box)(({ theme }) => ({
   backgroundColor: '#8B7355',
   color: 'white',
-  padding: '24px',
-  height: '140px',
+  padding: '16px',
+  height: '120px',
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'center',
   position: 'relative',
+  borderRadius: '8px',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-});
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px',
+    height: '140px',
+    borderRadius: '12px',
+  },
+}));
 
-const BackButton = styled(IconButton)({
+const BackButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
-  left: 16,
-  top: 24,
+  left: '8px',
+  top: '8px',
   color: 'white',
-  padding: '12px',
+  padding: '8px',
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-  }
-});
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  [theme.breakpoints.up('sm')]: {
+    left: '16px',
+    top: '16px',
+    padding: '12px',
+  },
+}));
 
-const HeaderTitle = styled(Typography)({
+const HeaderTitle = styled(Typography)(({ theme }) => ({
   color: 'white',
-  fontSize: '28px',
+  fontSize: '1.5rem',
   fontWeight: 600,
-  marginTop: 16,
-});
+  marginTop: '8px',
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.75rem',
+    marginTop: '16px',
+  },
+}));
 
-const Content = styled(Box)({
-  padding: '24px',
-  maxWidth: '800px',
-  margin: '0 auto',
-});
+const Content = styled(Box)(({ theme }) => ({
+  padding: '16px 0',
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px 0',
+  },
+}));
 
-const ProfileSection = styled(Box)({
+const ProfileSection = styled(Box)(({ theme }) => ({
   position: 'relative',
-  marginTop: -70,
-  marginBottom: 40,
+  marginTop: '-40px',
+  marginBottom: '20px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-});
+  [theme.breakpoints.up('sm')]: {
+    marginTop: '-70px',
+    marginBottom: '40px',
+  },
+}));
 
-const AvatarCircle = styled(Box)({
-  width: 140,
-  height: 140,
+const AvatarCircle = styled(Box)(({ theme }) => ({
+  width: '100px',
+  height: '100px',
   backgroundColor: '#F0EAE3',
   borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  border: '6px solid white',
+  border: '4px solid white',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  marginBottom: 16,
-});
+  marginBottom: '12px',
+  [theme.breakpoints.up('sm')]: {
+    width: '140px',
+    height: '140px',
+    border: '6px solid white',
+    marginBottom: '16px',
+  },
+}));
 
-const ChangePhotoButton = styled(Button)({
+const ChangePhotoButton = styled(Button)(({ theme }) => ({
   color: '#2C3E50',
-  fontSize: '18px',
-  padding: '8px 16px',
+  fontSize: '0.875rem',
+  padding: '6px 12px',
   backgroundColor: '#A5D6D9',
-  borderRadius: '12px',
+  borderRadius: '8px',
   textTransform: 'none',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   '&:hover': {
     backgroundColor: '#8FC1C4',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1rem',
+    padding: '8px 16px',
+    borderRadius: '12px',
+  },
+}));
 
-const FormSection = styled(Paper)({
-  padding: '24px',
-  marginBottom: '24px',
-  borderRadius: '12px',
+const FormSection = styled(Paper)(({ theme }) => ({
+  padding: '16px',
+  marginBottom: '16px',
+  borderRadius: '8px',
   backgroundColor: 'white',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-});
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px',
+    marginBottom: '24px',
+    borderRadius: '12px',
+  },
+}));
 
-const SectionTitle = styled(Typography)({
-  fontSize: '24px',
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '1.25rem',
   fontWeight: 600,
   color: '#2C3E50',
-  marginBottom: '24px',
-});
+  marginBottom: '16px',
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.5rem',
+    marginBottom: '24px',
+  },
+}));
 
-const InputLabel = styled(Typography)({
-  fontSize: '18px',
+const InputLabel = styled(Typography)(({ theme }) => ({
+  fontSize: '1rem',
   color: '#2C3E50',
-  marginBottom: '12px',
+  marginBottom: '8px',
   fontWeight: 500,
-});
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.125rem',
+    marginBottom: '12px',
+  },
+}));
 
-const FormField = styled(Box)({
-  marginBottom: '24px',
-});
+const FormField = styled(Box)(({ theme }) => ({
+  marginBottom: '16px',
+  [theme.breakpoints.up('sm')]: {
+    marginBottom: '24px',
+  },
+}));
 
-const StyledTextField = styled(TextField)({
+const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
+    borderRadius: '8px',
     backgroundColor: '#fff',
     '& fieldset': {
       borderColor: '#A5D6D9',
@@ -135,8 +187,8 @@ const StyledTextField = styled(TextField)({
     },
   },
   '& .MuiOutlinedInput-input': {
-    padding: '16px',
-    fontSize: '18px',
+    padding: '12px',
+    fontSize: '1rem',
     color: '#2C3E50',
     '&::placeholder': {
       color: '#666',
@@ -144,13 +196,22 @@ const StyledTextField = styled(TextField)({
     },
   },
   '& .MuiInputLabel-root': {
-    fontSize: '18px',
+    fontSize: '1rem',
     color: '#2C3E50',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    '& .MuiOutlinedInput-input': {
+      padding: '16px',
+      fontSize: '1.125rem',
+    },
+    '& .MuiInputLabel-root': {
+      fontSize: '1.125rem',
+    },
+  },
+}));
 
-const StyledSelect = styled(Select)({
-  borderRadius: '12px',
+const StyledSelect = styled(Select)(({ theme }) => ({
+  borderRadius: '8px',
   backgroundColor: '#fff',
   '& .MuiOutlinedInput-notchedOutline': {
     borderColor: '#A5D6D9',
@@ -163,35 +224,46 @@ const StyledSelect = styled(Select)({
     borderColor: '#8FC1C4',
   },
   '& .MuiSelect-select': {
-    padding: '16px !important',
-    fontSize: '18px',
+    padding: '12px !important',
+    fontSize: '1rem',
     color: '#2C3E50',
   },
   '& .MuiSelect-icon': {
     color: '#2C3E50',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    '& .MuiSelect-select': {
+      padding: '16px !important',
+      fontSize: '1.125rem',
+    },
+  },
+}));
 
-const UpdateButton = styled(Button)({
+const UpdateButton = styled(Button)(({ theme }) => ({
   backgroundColor: '#A5D6D9',
   color: '#2C3E50',
-  borderRadius: '12px',
-  padding: '16px',
+  borderRadius: '8px',
+  padding: '12px',
   width: '100%',
   textTransform: 'none',
-  fontSize: '20px',
+  fontSize: '1.125rem',
   fontWeight: 600,
-  marginTop: '32px',
+  marginTop: '24px',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   '&:hover': {
     backgroundColor: '#8FC1C4',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    padding: '16px',
+    fontSize: '1.25rem',
+    marginTop: '32px',
+  },
+}));
 
-const StyledDatePicker = styled(DatePicker)({
+const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
   width: '100%',
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
+    borderRadius: '8px',
     backgroundColor: '#fff',
     '& fieldset': {
       borderColor: '#A5D6D9',
@@ -205,17 +277,26 @@ const StyledDatePicker = styled(DatePicker)({
     },
   },
   '& .MuiOutlinedInput-input': {
-    padding: '16px',
-    fontSize: '18px',
+    padding: '12px',
+    fontSize: '1rem',
     color: '#2C3E50',
   },
   '& .MuiInputAdornment-root .MuiIconButton-root': {
     color: '#2C3E50',
-    padding: '12px',
+    padding: '8px',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    '& .MuiOutlinedInput-input': {
+      padding: '16px',
+      fontSize: '1.125rem',
+    },
+    '& .MuiInputAdornment-root .MuiIconButton-root': {
+      padding: '12px',
+    },
+  },
+}));
 
-const LoadingOverlay = styled(Box)({
+const LoadingOverlay = styled(Box)(({ theme }) => ({
   position: 'fixed',
   top: 0,
   left: 0,
@@ -226,46 +307,64 @@ const LoadingOverlay = styled(Box)({
   justifyContent: 'center',
   alignItems: 'center',
   zIndex: 9999,
-});
+}));
 
-const EmergencyContactsSection = styled(Paper)({
-  marginTop: '32px',
-  padding: '24px',
+const EmergencyContactsSection = styled(Paper)(({ theme }) => ({
+  marginTop: '24px',
+  padding: '16px',
   backgroundColor: 'white',
-  borderRadius: '12px',
+  borderRadius: '8px',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-});
+  [theme.breakpoints.up('sm')]: {
+    marginTop: '32px',
+    padding: '24px',
+    borderRadius: '12px',
+  },
+}));
 
-const ContactField = styled(Box)({
-  marginBottom: '24px',
-  padding: '20px',
+const ContactField = styled(Box)(({ theme }) => ({
+  marginBottom: '16px',
+  padding: '12px',
   backgroundColor: '#F8F9FA',
-  borderRadius: '12px',
+  borderRadius: '8px',
   border: '2px solid #A5D6D9',
-});
+  [theme.breakpoints.up('sm')]: {
+    marginBottom: '24px',
+    padding: '20px',
+    borderRadius: '12px',
+  },
+}));
 
-const AddContactButton = styled(Button)({
-  marginTop: '16px',
+const AddContactButton = styled(Button)(({ theme }) => ({
+  marginTop: '12px',
   color: '#2C3E50',
   backgroundColor: '#A5D6D9',
-  borderRadius: '12px',
+  borderRadius: '8px',
   textTransform: 'none',
-  padding: '12px 24px',
-  fontSize: '18px',
+  padding: '8px 16px',
+  fontSize: '1rem',
   fontWeight: 600,
   '&:hover': {
     backgroundColor: '#8FC1C4',
-  }
-});
+  },
+  [theme.breakpoints.up('sm')]: {
+    marginTop: '16px',
+    padding: '12px 24px',
+    fontSize: '1.125rem',
+  },
+}));
 
-const DeleteContactButton = styled(IconButton)({
+const DeleteContactButton = styled(IconButton)(({ theme }) => ({
   color: '#FF4444',
-  padding: '12px',
+  padding: '8px',
   backgroundColor: '#FFE4E4',
   '&:hover': {
-    backgroundColor: '#FFD1D1'
-  }
-});
+    backgroundColor: '#FFD1D1',
+  },
+  [theme.breakpoints.up('sm')]: {
+    padding: '12px',
+  },
+}));
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -323,7 +422,6 @@ const EditProfile = () => {
     if (userData.height && (isNaN(userData.height) || Number(userData.height) < 0)) return 'Please enter a valid height';
     if (userData.weight && (isNaN(userData.weight) || Number(userData.weight) < 0)) return 'Please enter a valid weight';
     
-    // Validate at least one emergency contact
     const hasValidContact = userData.emergencyContacts.some(contact => 
       contact.name.trim() && contact.phoneNumber.trim() && contact.relationship.trim()
     );
@@ -421,7 +519,7 @@ const EditProfile = () => {
     <PageContainer>
       <Header>
         <BackButton onClick={() => navigate('/profile')}>
-          <ArrowBackIcon sx={{ fontSize: 28 }} />
+          <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
         </BackButton>
         <HeaderTitle>Edit Profile</HeaderTitle>
       </Header>
@@ -429,7 +527,7 @@ const EditProfile = () => {
       <Content>
         <ProfileSection>
           <AvatarCircle>
-            <PersonIcon sx={{ fontSize: 80, color: '#8B7355' }} />
+            <PersonIcon sx={{ fontSize: '2rem', color: '#8B7355' }} />
           </AvatarCircle>
           <ChangePhotoButton startIcon={<AddCircleOutlineIcon />}>
             Change Photo
@@ -440,9 +538,9 @@ const EditProfile = () => {
           <Alert 
             severity="error" 
             sx={{ 
-              mb: 3, 
-              fontSize: '18px',
-              '& .MuiAlert-message': { padding: '8px 0' }
+              mb: 2, 
+              fontSize: '1rem',
+              '& .MuiAlert-message': { padding: '4px 0' }
             }}
             onClose={() => setError('')}
           >
@@ -453,9 +551,9 @@ const EditProfile = () => {
           <Alert 
             severity="success"
             sx={{ 
-              mb: 3, 
-              fontSize: '18px',
-              '& .MuiAlert-message': { padding: '8px 0' }
+              mb: 2, 
+              fontSize: '1rem',
+              '& .MuiAlert-message': { padding: '4px 0' }
             }}
             onClose={() => setSuccess(false)}
           >
@@ -504,9 +602,9 @@ const EditProfile = () => {
               value={userData.gender}
               onChange={handleInputChange}
             >
-              <MenuItem value="male">Male</MenuItem>
-              <MenuItem value="female">Female</MenuItem>
-              <MenuItem value="other">Other</MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
             </StyledSelect>
           </FormField>
           <FormField>
@@ -588,15 +686,15 @@ const EditProfile = () => {
         </FormSection>
 
         <EmergencyContactsSection>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-            <ContactPhoneIcon sx={{ fontSize: 28, color: '#2C3E50' }} />
-            <SectionTitle sx={{ mb: 0 }}>Emergency Contacts</SectionTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '12px' }}>
+            <ContactPhoneIcon sx={{ fontSize: '1.5rem', color: '#2C3E50' }} />
+            <SectionTitle sx={{ mb: 0, fontSize: '1.25rem' }}>Emergency Contacts</SectionTitle>
           </Box>
           
           {userData.emergencyContacts.map((contact, index) => (
             <ContactField key={index}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontSize: '20px', fontWeight: 600, color: '#2C3E50' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '8px' }}>
+                <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600, color: '#2C3E50' }}>
                   Contact {index + 1}
                 </Typography>
                 {index > 0 && (
@@ -636,7 +734,7 @@ const EditProfile = () => {
           ))}
           
           <AddContactButton
-            startIcon={<AddCircleOutlineIcon sx={{ fontSize: 24 }} />}
+            startIcon={<AddCircleOutlineIcon sx={{ fontSize: '1.25rem' }} />}
             onClick={handleAddContact}
             fullWidth
           >
@@ -651,11 +749,11 @@ const EditProfile = () => {
 
       {loading && (
         <LoadingOverlay>
-          <CircularProgress size={60} />
+          <CircularProgress size={40} />
         </LoadingOverlay>
       )}
     </PageContainer>
   );
 };
 
-export default EditProfile; 
+export default EditProfile;

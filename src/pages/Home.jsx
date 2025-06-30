@@ -81,6 +81,14 @@ const getWeatherTip = (condition, temp_c) => {
     return "Great day for a short walk! Don't forget sunscreen and a hat.";
   } else if (conditionLower.includes('cloud')) {
     return "Good conditions for outdoor activities. Carry a light jacket just in case.";
+  } else if (conditionLower.includes('mist')) {
+    return "Watch your step in mist - it can hide hazards. Use a cane if needed.";
+  } else if (conditionLower.includes('fog')) {
+    return "Stay indoors if fog is thick. Use lights if you must go out.";
+  } else if (conditionLower.includes('thunderstorm')) {
+    return "Stay inside during thunderstorms. Avoid water and electronics.";
+  } else if (conditionLower.includes('haze')) {
+    return "Limit outdoor time in haze. Wear a mask if air quality is poor.";
   }
 
   return "Take care and dress appropriately for the weather.";
@@ -263,6 +271,46 @@ const MOTIVATIONAL_QUOTES = [
   {
     text: "Remember to smile - it's the best medicine for the soul!",
     category: "wellness"
+  },
+  {
+    text: "Eating well today keeps you strong for tomorrow!",
+    category: "health"
+  },
+  {
+    text: "Set a reminder for your pills - you're worth the care!",
+    category: "medication"
+  },
+  {
+    text: "Keep going - your strength inspires those around you!",
+    category: "motivation"
+  },
+  {
+    text: "Call a friend today - a chat can lift your spirits!",
+    category: "social"
+  },
+  {
+    text: "Rest when you need to - it’s okay to take it slow.",
+    category: "wellness"
+  },
+  {
+    text: "Stick to your routine - it’s the key to feeling good!",
+    category: "routine"
+  },
+  {
+    text: "A short stretch can work wonders for your body!",
+    category: "activity"
+  },
+  {
+    text: "Your family loves seeing you healthy and happy!",
+    category: "family"
+  },
+  {
+    text: "Fresh air today will refresh your mind and soul!",
+    category: "wellness"
+  },
+  {
+    text: "Believe in yourself - you’re stronger than you know!",
+    category: "motivation"
   }
 ];
 
@@ -607,7 +655,6 @@ const Home = () => {
     };
 
     fetchWeather();
-    // Refresh weather data every 5 minutes
     const interval = setInterval(fetchWeather, 300000);
 
     return () => clearInterval(interval);
@@ -656,7 +703,6 @@ const Home = () => {
     };
 
     updateQuote();
-
     const interval = setInterval(updateQuote, 3600000);
 
     return () => clearInterval(interval);
@@ -687,11 +733,21 @@ const Home = () => {
         ...doc.data()
       }));
 
-      // Sort reminders by time
+      // Sort by time: AM first, then PM, and chronologically within each
       reminders.sort((a, b) => {
         const timeA = a.time || '00:00';
         const timeB = b.time || '00:00';
-        return timeA.localeCompare(timeB);
+        const [hoursA, minutesA] = timeA.split(':');
+        const [hoursB, minutesB] = timeB.split(':');
+        const periodA = timeA.match(/am|pm/i) ? timeA.match(/am|pm/i)[0].toLowerCase() : 'am';
+        const periodB = timeB.match(/am|pm/i) ? timeB.match(/am|pm/i)[0].toLowerCase() : 'am';
+        const hourA = periodA === 'pm' && parseInt(hoursA) !== 12 ? parseInt(hoursA) + 12 : parseInt(hoursA);
+        const hourB = periodB === 'pm' && parseInt(hoursB) !== 12 ? parseInt(hoursB) + 12 : parseInt(hoursB);
+
+        // Compare periods first (AM < PM), then hours, then minutes
+        if (periodA !== periodB) return periodA === 'am' ? -1 : 1;
+        if (hourA !== hourB) return hourA - hourB;
+        return parseInt(minutesA) - parseInt(minutesB);
       });
 
       setMedicationReminders(reminders);
@@ -699,10 +755,6 @@ const Home = () => {
       console.error('Error fetching medication reminders:', error);
     }
   };
-
-  useEffect(() => {
-    fetchMedicationReminders();
-  }, [currentUser]);
 
   const fetchRoutineReminders = async () => {
     if (!currentUser?.uid) return;
@@ -721,11 +773,21 @@ const Home = () => {
         ...doc.data()
       }));
 
-      // Sort reminders by time
+      // Sort by time: AM first, then PM, and chronologically within each
       reminders.sort((a, b) => {
         const timeA = a.time || '00:00';
         const timeB = b.time || '00:00';
-        return timeA.localeCompare(timeB);
+        const [hoursA, minutesA] = timeA.split(':');
+        const [hoursB, minutesB] = timeB.split(':');
+        const periodA = timeA.match(/am|pm/i) ? timeA.match(/am|pm/i)[0].toLowerCase() : 'am';
+        const periodB = timeB.match(/am|pm/i) ? timeB.match(/am|pm/i)[0].toLowerCase() : 'am';
+        const hourA = periodA === 'pm' && parseInt(hoursA) !== 12 ? parseInt(hoursA) + 12 : parseInt(hoursA);
+        const hourB = periodB === 'pm' && parseInt(hoursB) !== 12 ? parseInt(hoursB) + 12 : parseInt(hoursB);
+
+        // Compare periods first (AM < PM), then hours, then minutes
+        if (periodA !== periodB) return periodA === 'am' ? -1 : 1;
+        if (hourA !== hourB) return hourA - hourB;
+        return parseInt(minutesA) - parseInt(minutesB);
       });
 
       setRoutineReminders(reminders);
@@ -735,11 +797,33 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchRoutineReminders();
+    const refreshReminders = async () => {
+      await fetchMedicationReminders();
+      await fetchRoutineReminders();
+    };
+
+    refreshReminders();
+    const interval = setInterval(refreshReminders, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(interval);
   }, [currentUser]);
 
   const formatTime = (time) => {
     try {
+      // Handle 12-hour format with AM/PM (e.g., "2:00 pm" or "2:00 PM")
+      if (typeof time === 'string' && time.match(/(\d{1,2}:\d{2})\s*(am|pm)/i)) {
+        const [timePart, period] = time.split(/\s+/);
+        const [hours, minutes] = timePart.split(':');
+        const date = new Date();
+        date.setHours(period.toLowerCase() === 'pm' && parseInt(hours) !== 12 ? parseInt(hours) + 12 : parseInt(hours));
+        date.setMinutes(parseInt(minutes));
+        return date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
+      // Fallback for 24-hour format or invalid input
       const [hours, minutes] = time.split(':');
       const date = new Date();
       date.setHours(parseInt(hours));
@@ -750,7 +834,8 @@ const Home = () => {
         hour12: true
       });
     } catch (error) {
-      return time;
+      console.error('Error formatting time:', error);
+      return time || 'Invalid Time';
     }
   };
 
@@ -1019,4 +1104,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;

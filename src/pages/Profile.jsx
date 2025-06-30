@@ -13,105 +13,149 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-const PageContainer = styled(Box)({
-  maxWidth: '800px',
-  margin: '0 auto',
-  backgroundColor: '#F5F5F5',
+const PageContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
   minHeight: '100vh',
-  position: 'relative',
-});
+  backgroundColor: '#F5F5F5',
+  padding: '16px',
+  boxSizing: 'border-box',
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px',
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+}));
 
-const ProfileHeader = styled(Box)({
+const ProfileHeader = styled(Box)(({ theme }) => ({
   backgroundColor: '#8B7355',
   color: 'white',
-  padding: '24px',
+  padding: '16px',
   position: 'relative',
-  height: '140px',
+  height: '120px',
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'center',
+  borderRadius: '8px',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   '& .MuiTypography-root': {
     position: 'absolute',
-    top: '24px',
+    top: '16px',
     left: '50%',
     transform: 'translateX(-50%)',
     width: '100%',
     textAlign: 'center',
-  }
-});
+  },
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px',
+    height: '140px',
+    borderRadius: '12px',
+  },
+}));
 
-const BackButton = styled(IconButton)({
+const BackButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
-  left: 16,
-  top: 24,
+  left: '8px',
+  top: '8px',
   color: 'white',
-  padding: '12px',
+  padding: '8px',
   zIndex: 1,
-  width: '48px',
-  height: '48px',
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-  }
-});
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  [theme.breakpoints.up('sm')]: {
+    left: '16px',
+    top: '24px',
+    padding: '12px',
+    width: '48px',
+    height: '48px',
+  },
+}));
 
-const ProfileTitle = styled(Typography)({
+const ProfileTitle = styled(Typography)(({ theme }) => ({
   color: 'white',
-  fontSize: '28px',
+  fontSize: '1.5rem',
   fontWeight: 600,
   margin: 0,
-});
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.75rem',
+  },
+}));
 
-const ProfileAvatar = styled(Box)({
+const ProfileAvatar = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  marginTop: '-70px',
-  marginBottom: '24px',
-});
+  marginTop: '-40px',
+  marginBottom: '16px',
+  [theme.breakpoints.up('sm')]: {
+    marginTop: '-70px',
+    marginBottom: '24px',
+  },
+}));
 
-const StyledAvatar = styled(Avatar)({
-  width: 140,
-  height: 140,
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: '100px',
+  height: '100px',
   backgroundColor: '#F0EAE3',
-  border: '6px solid white',
+  border: '4px solid white',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-});
+  [theme.breakpoints.up('sm')]: {
+    width: '140px',
+    height: '140px',
+    border: '6px solid white',
+  },
+}));
 
-const EditButton = styled(Button)({
+const EditButton = styled(Button)(({ theme }) => ({
   backgroundColor: '#A5D6D9',
   color: '#2C3E50',
-  borderRadius: '12px',
-  padding: '12px 32px',
-  marginTop: '16px',
+  borderRadius: '8px',
+  padding: '6px 16px',
+  marginTop: '12px',
   textTransform: 'none',
-  fontSize: '18px',
+  fontSize: '0.875rem',
   fontWeight: 600,
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   '&:hover': {
     backgroundColor: '#8FC1C4',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    padding: '12px 32px',
+    marginTop: '16px',
+    fontSize: '1rem',
+    borderRadius: '12px',
+  },
+}));
 
-const SectionTitle = styled(Typography)({
-  fontSize: '24px',
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '1.25rem',
   fontWeight: 600,
-  padding: '20px',
+  padding: '12px',
   backgroundColor: '#A5D6D9',
   color: '#2C3E50',
-  borderRadius: '12px 12px 0 0',
-});
+  borderRadius: '8px 8px 0 0',
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.5rem',
+    padding: '20px',
+    borderRadius: '12px 12px 0 0',
+  },
+}));
 
-const InfoList = styled(Paper)({
+const InfoList = styled(Paper)(({ theme }) => ({
   padding: '8px',
-  marginBottom: '24px',
-  borderRadius: '0 0 12px 12px',
+  marginBottom: '16px',
+  borderRadius: '0 0 8px 8px',
   backgroundColor: 'white',
   boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-});
+  [theme.breakpoints.up('sm')]: {
+    padding: '8px',
+    marginBottom: '24px',
+    borderRadius: '0 0 12px 12px',
+  },
+}));
 
-const InfoListItem = styled(ListItem)({
-  padding: '20px',
+const InfoListItem = styled(ListItem)(({ theme }) => ({
+  padding: '12px',
   borderBottom: '1px solid #E0E0E0',
   '&:last-child': {
     borderBottom: 'none',
@@ -119,27 +163,51 @@ const InfoListItem = styled(ListItem)({
   '&:hover': {
     backgroundColor: '#F8F8F8',
   },
-});
+  [theme.breakpoints.up('sm')]: {
+    padding: '20px',
+  },
+}));
 
-const InfoLabel = styled(Typography)({
-  fontSize: '18px',
+const InfoLabel = styled(Typography)(({ theme }) => ({
+  fontSize: '1rem',
   color: '#2C3E50',
   fontWeight: 500,
-});
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.125rem',
+  },
+}));
 
-const InfoValue = styled(Typography)({
-  fontSize: '18px',
+const InfoValue = styled(Typography)(({ theme }) => ({
+  fontSize: '1rem',
   color: '#666',
   textAlign: 'right',
   flex: 1,
   fontWeight: 500,
-});
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '1.125rem',
+  },
+}));
 
-const Content = styled(Box)({
-  padding: '24px',
-  maxWidth: '800px',
-  margin: '0 auto',
-});
+const Content = styled(Box)(({ theme }) => ({
+  padding: '16px 0',
+  [theme.breakpoints.up('sm')]: {
+    padding: '24px 0',
+  },
+}));
+
+const DocumentListItem = styled(ListItem)(({ theme }) => ({
+  padding: '12px',
+  borderBottom: '1px solid #E0E0E0',
+  '&:last-child': {
+    borderBottom: 'none',
+  },
+  '&:hover': {
+    backgroundColor: '#F8F8F8',
+  },
+  [theme.breakpoints.up('sm')]: {
+    padding: '16px',
+  },
+}));
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -155,6 +223,7 @@ const Profile = () => {
     bloodGroup: '',
     bloodPressure: '',
     allergy: '',
+    emergencyContacts: [],
   });
 
   useEffect(() => {
@@ -167,6 +236,7 @@ const Profile = () => {
           setUserData({
             ...data,
             dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+            emergencyContacts: data.emergencyContacts || [],
           });
         }
       }
@@ -188,17 +258,18 @@ const Profile = () => {
   };
 
   const documents = [
-    { title: 'Aadhar Card' },
-    { title: 'PAN Card' },
-    { title: 'Prescription' },
-    { title: 'Diabetes Report' },
+    { title: 'Aadhar Card', category: 'Identity Documents' },
+    { title: 'PAN Card', category: 'Identity Documents' },
+    { title: 'Prescription', category: 'Medical Records' },
+    { title: 'Diabetes Report', category: 'Medical Records' },
+    { title: 'Family Photo 1', category: 'Family Photos' },
   ];
 
   return (
     <PageContainer>
       <ProfileHeader>
         <BackButton onClick={() => handleNavigation('/')} aria-label="Back to home">
-          <ArrowBackIcon sx={{ fontSize: 28 }} />
+          <ArrowBackIcon sx={{ fontSize: '1.5rem' }} />
         </BackButton>
         <ProfileTitle>My Profile</ProfileTitle>
       </ProfileHeader>
@@ -206,17 +277,17 @@ const Profile = () => {
       <Content>
         <ProfileAvatar>
           <StyledAvatar>
-            <PersonIcon sx={{ fontSize: 80, color: '#8B7355' }} />
+            <PersonIcon sx={{ fontSize: '2rem', color: '#8B7355' }} />
           </StyledAvatar>
           <EditButton 
             onClick={() => handleNavigation('/edit-profile')}
-            startIcon={<EditIcon sx={{ fontSize: 24 }} />}
+            startIcon={<EditIcon sx={{ fontSize: '1.25rem' }} />}
           >
             Edit Profile
           </EditButton>
         </ProfileAvatar>
 
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 3 }}>
           <SectionTitle>Personal Information</SectionTitle>
           <InfoList>
             <InfoListItem>
@@ -242,7 +313,7 @@ const Profile = () => {
           </InfoList>
         </Box>
 
-        <Box>
+        <Box sx={{ mb: 3 }}>
           <SectionTitle>Health Information</SectionTitle>
           <InfoList>
             <InfoListItem>
@@ -268,18 +339,47 @@ const Profile = () => {
           </InfoList>
         </Box>
 
-        <SectionTitle>Uploaded Documents</SectionTitle>
-        <List>
-          {documents.map((doc, index) => (
-            <ListItem key={index} button>
-              <ListItemText primary={doc.title} />
-              <ChevronRightIcon color="action" />
-            </ListItem>
-          ))}
-        </List>
+        <Box sx={{ mb: 3 }}>
+          <SectionTitle>Emergency Contacts</SectionTitle>
+          <InfoList>
+            {userData.emergencyContacts.length > 0 ? (
+              userData.emergencyContacts.map((contact, index) => (
+                <InfoListItem key={index}>
+                  <InfoLabel>{contact.name || 'Contact'}</InfoLabel>
+                  <InfoValue>{contact.phoneNumber || '-'}</InfoValue>
+                </InfoListItem>
+              ))
+            ) : (
+              <InfoListItem>
+                <InfoValue>No contacts added</InfoValue>
+              </InfoListItem>
+            )}
+          </InfoList>
+        </Box>
+
+        <Box>
+          <SectionTitle>Uploaded Documents</SectionTitle>
+          <List>
+            {documents.map((doc, index) => (
+              <DocumentListItem
+                key={index}
+                button
+                onClick={() => handleNavigation('/documents')}
+              >
+                <ListItemText
+                  primary={doc.title}
+                  secondary={doc.category}
+                  primaryTypographyProps={{ fontSize: '1rem', fontWeight: 500 }}
+                  secondaryTypographyProps={{ fontSize: '0.875rem', color: '#666' }}
+                />
+                <ChevronRightIcon color="action" />
+              </DocumentListItem>
+            ))}
+          </List>
+        </Box>
       </Content>
     </PageContainer>
   );
 };
 
-export default Profile; 
+export default Profile;
