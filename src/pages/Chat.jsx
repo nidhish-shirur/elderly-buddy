@@ -255,8 +255,7 @@ const commonQuestions = [
   { text: "Show my water intake", category: "health" },
   { text: "Emergency contacts", category: "emergency" },
   { text: "What time is it?", category: "time" },
-  { text: "Today's date", category: "date" },
-  { text: "How are you feeling?", category: "general" }
+  { text: "Today's date", category: "date" }
 ];
 
 const Chat = () => {
