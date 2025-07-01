@@ -18,15 +18,20 @@ import { db } from '../utils/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import SpeechButton from '../components/SpeechButton';
 
-const PageContainer = styled(Box)({
+const PageContainer = styled(Box)(({ theme }) => ({
   maxWidth: '480px',
   margin: '0 auto',
   minHeight: '100vh',
   backgroundColor: '#FFF3F0',
   position: 'relative',
-});
+  [theme.breakpoints.up('md')]: {
+    maxWidth: '900px',
+    padding: theme.spacing(4, 0),
+    background: 'linear-gradient(135deg, #fff3f0 0%, #f8fafc 100%)',
+  },
+}));
 
-const Header = styled(Box)({
+const Header = styled(Box)(({ theme }) => ({
   backgroundColor: '#E74C3C',
   color: 'white',
   padding: '20px',
@@ -34,35 +39,68 @@ const Header = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-});
+  borderRadius: 0,
+  [theme.breakpoints.up('md')]: {
+    borderRadius: '18px 18px 0 0',
+    padding: '32px 40px 28px 40px',
+    fontSize: 28,
+    boxShadow: '0 4px 24px rgba(231,76,60,0.13)',
+  },
+}));
 
-const BackButton = styled(IconButton)({
+const BackButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   left: 16,
   color: 'white',
-});
+  [theme.breakpoints.up('md')]: {
+    left: 32,
+    top: 32,
+    background: 'rgba(255,255,255,0.10)',
+    '&:hover': {
+      background: 'rgba(255,255,255,0.18)',
+    },
+  },
+}));
 
-const EmergencyTitle = styled(Typography)({
+const EmergencyTitle = styled(Typography)(({ theme }) => ({
   fontSize: '24px',
   fontWeight: 600,
   textAlign: 'center',
   marginLeft: 48,
   marginRight: 48,
-});
+  [theme.breakpoints.up('md')]: {
+    fontSize: '32px',
+    marginLeft: 0,
+    marginRight: 0,
+    letterSpacing: 1,
+  },
+}));
 
-const ContentSection = styled(Box)({
+const ContentSection = styled(Box)(({ theme }) => ({
   padding: '24px',
-});
+  [theme.breakpoints.up('md')]: {
+    padding: '40px 60px 32px 60px',
+    background: '#fff',
+    borderRadius: '0 0 18px 18px',
+    boxShadow: '0 4px 32px rgba(74,111,165,0.10)',
+    marginBottom: theme.spacing(4),
+  },
+}));
 
-const EmergencyInstructions = styled(Box)({
+const EmergencyInstructions = styled(Box)(({ theme }) => ({
   backgroundColor: 'white',
   padding: '20px',
   borderRadius: '12px',
   marginBottom: '24px',
   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-});
+  [theme.breakpoints.up('md')]: {
+    padding: '32px',
+    fontSize: 18,
+    marginBottom: '32px',
+  },
+}));
 
-const ContactCard = styled(Button)({
+const ContactCard = styled(Button)(({ theme }) => ({
   backgroundColor: 'white',
   width: '100%',
   padding: '20px',
@@ -77,9 +115,16 @@ const ContactCard = styled(Button)({
   '&:hover': {
     backgroundColor: '#FFF9F8',
   },
-});
+  [theme.breakpoints.up('md')]: {
+    padding: '28px 32px',
+    marginBottom: '24px',
+    fontSize: 18,
+    borderRadius: '16px',
+    boxShadow: '0 4px 16px rgba(74,111,165,0.10)',
+  },
+}));
 
-const EmergencyServiceButton = styled(Button)({
+const EmergencyServiceButton = styled(Button)(({ theme }) => ({
   backgroundColor: '#E74C3C',
   color: 'white',
   width: '100%',
@@ -92,7 +137,14 @@ const EmergencyServiceButton = styled(Button)({
   '&:hover': {
     backgroundColor: '#D44333',
   },
-});
+  [theme.breakpoints.up('md')]: {
+    padding: '28px 0',
+    fontSize: 22,
+    borderRadius: '16px',
+    marginBottom: '28px',
+    boxShadow: '0 4px 16px rgba(231,76,60,0.10)',
+  },
+}));
 
 const LoadingOverlay = styled(Box)({
   position: 'fixed',
@@ -260,4 +312,4 @@ const Emergency = () => {
   );
 };
 
-export default Emergency; 
+export default Emergency;

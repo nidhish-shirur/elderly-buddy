@@ -52,16 +52,17 @@ const BarcodeScanner = ({ onScan }) => {
   const [scanResult, setScanResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const { ref, loading } = useZxing({
+  const { ref, loading, hasDevices } = useZxing({
     onDecodeResult: (result) => {
       const barcodeText = result.getText();
+      console.log('Barcode scanned:', barcodeText);
       setScanResult(barcodeText);
-      onScan(barcodeText); // Pass the result to the parent
-      setTimeout(() => setIsOpen(false), 1000); // Close after a brief delay
+      onScan(barcodeText);
+      setTimeout(() => setIsOpen(false), 1000);
     },
     onError: (error) => {
-      setError('Failed to access camera or decode barcode. Please ensure camera permissions are granted.');
       console.error('Zxing error:', error);
+      setError(`Failed to access camera or decode barcode: ${error.message}. Please check permissions or ensure a camera is connected.`);
     },
   });
 
@@ -69,15 +70,29 @@ const BarcodeScanner = ({ onScan }) => {
     if (!isOpen) {
       setScanResult(null);
       setError(null);
+    } else {
+      console.log('Dialog opened, checking devices:', hasDevices, 'Loading:', loading);
     }
-  }, [isOpen]);
+  }, [isOpen, hasDevices, loading]);
+
+  useEffect(() => {
+    if (hasDevices === false) {
+      console.warn('No camera devices detected.');
+      setError('No camera detected. Please connect a webcam or check device settings.');
+    }
+  }, [hasDevices]);
+
+  const handleButtonClick = () => {
+    console.log('Button clicked, setting isOpen to true');
+    setIsOpen(true);
+  };
 
   return (
     <>
       <ScanButton
         startIcon={<QrCodeScannerIcon />}
-        onClick={() => setIsOpen(true)}
-        disabled={loading}
+        onClick={handleButtonClick}
+        disabled={loading || (hasDevices === false && !isOpen)} // Allow click if dialog is open
       >
         Scan Medication Barcode
       </ScanButton>

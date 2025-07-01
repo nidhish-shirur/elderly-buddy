@@ -8,7 +8,7 @@ import { IoCheckmarkCircle, IoEllipseOutline } from 'react-icons/io5';
 import { IoPencil } from 'react-icons/io5';
 import speechService from '../utils/speechService';
 
-const Routine = () => {
+const Routine = ({ voiceIntent }) => {
   const navigate = useNavigate();
   const [routines, setRoutines] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -36,6 +36,22 @@ const Routine = () => {
 
     return () => unsubscribe();
   }, [navigate]);
+
+  // Handler for voice intent (from Chat)
+  useEffect(() => {
+    if (!voiceIntent) return;
+    if (voiceIntent.type === 'addDailyRoutine') {
+      setShowAddModal(true);
+      setNewRoutine(prev => ({
+        ...prev,
+        task: voiceIntent.task || '',
+        time: voiceIntent.time || '',
+        date: 'everyday'
+      }));
+    }
+    // You can add more intent types here if needed
+    // eslint-disable-next-line
+  }, [voiceIntent]);
 
   const loadRoutines = async (userId) => {
     try {
@@ -159,6 +175,28 @@ const Routine = () => {
     }
   };
 
+  // Compose a full routine summary for speech
+  const getFullRoutineSpeech = () => {
+    if (routines.length === 0) {
+      return 'You have no routines scheduled for today.';
+    }
+    const activeText = activeRoutines.length > 0
+      ? `Your active tasks are: ${activeRoutines.map(r =>
+          `${r.task} at ${r.time} on ${r.date === 'everyday'
+            ? 'everyday'
+            : new Date(r.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`
+        ).join(', ')}.`
+      : 'You have no active tasks.';
+    const completedText = completedRoutines.length > 0
+      ? `Your completed tasks are: ${completedRoutines.map(r =>
+          `${r.task} at ${r.time} on ${r.date === 'everyday'
+            ? 'everyday'
+            : new Date(r.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}`
+        ).join(', ')}.`
+      : 'You have no completed tasks.';
+    return `Here is your schedule for today. ${activeText} ${completedText}`;
+  };
+
   const speakReminder = (routine) => {
     if (routine.task === 'all tasks') {
       const activeText = activeRoutines.length > 0
@@ -214,16 +252,24 @@ const Routine = () => {
             <IoEllipseOutline size={24} color="#00BFA5" />
           )}
         </button>
-        <div style={{
-          ...styles.routineText,
-          textDecoration: routine.completed ? 'line-through' : 'none',
-          color: routine.completed ? '#999' : '#000'
-        }}>
-          {routine.task}
+        <div style={styles.routineTextContainer}>
+          <div
+            style={{
+              ...styles.routineText,
+              textDecoration: routine.completed ? 'line-through' : 'none',
+              color: routine.completed ? '#999' : '#000'
+            }}
+          >
+            {routine.task}
+          </div>
+          <div style={styles.routineTime}>
+            {routine.time} - {routine.date === 'everyday'
+              ? 'Everyday'
+              : new Date(routine.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </div>
         </div>
       </div>
       <div style={styles.routineRight}>
-        <div style={styles.routineTime}>{routine.time} - {routine.date === 'everyday' ? 'Everyday' : new Date(routine.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
         <button
           onClick={() => handleEditClick(routine)}
           style={styles.editButton}
@@ -241,7 +287,10 @@ const Routine = () => {
           <IoArrowBack size={24} />
         </Link>
         <h1 style={styles.title}>Schedule Today</h1>
-        <button onClick={() => speakReminder({ task: 'all tasks', time: 'scheduled times' })} style={styles.speakerButton}>
+        <button
+          onClick={() => speechService.speak(getFullRoutineSpeech(), 1.1, 1.2)}
+          style={styles.speakerButton}
+        >
           <IoVolumeHighOutline size={24} />
         </button>
       </div>
@@ -598,6 +647,37 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
   },
+  routineTextContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    minWidth: 0,
+  },
+  routineText: {
+    fontSize: '16px',
+    fontWeight: '400',
+    transition: 'all 0.2s ease',
+    wordBreak: 'break-word',
+    '@media (min-width: 600px)': {
+      fontSize: '18px',
+    },
+    '@media (min-width: 1024px)': {
+      fontSize: '20px',
+    },
+  },
+  routineTime: {
+    fontSize: '14px',
+    color: '#00BFA5',
+    fontWeight: '500',
+    marginTop: '2px',
+    wordBreak: 'break-word',
+    '@media (min-width: 600px)': {
+      fontSize: '15px',
+    },
+    '@media (min-width: 1024px)': {
+      fontSize: '16px',
+    },
+  },
   routineRight: {
     display: 'flex',
     alignItems: 'center',
@@ -635,51 +715,35 @@ const styles = {
       },
     },
   },
-  routineText: {
-    fontSize: '16px',
-    fontWeight: '400',
-    transition: 'all 0.2s ease',
-    '@media (min-width: 600px)': {
-      fontSize: '18px',
-    },
-    '@media (min-width: 1024px)': {
-      fontSize: '20px',
-    },
-  },
-  routineTime: {
-    fontSize: '16px',
-    color: '#00BFA5',
-    fontWeight: '500',
-    '@media (min-width: 600px)': {
-      fontSize: '18px',
-    },
-    '@media (min-width: 1024px)': {
-      fontSize: '20px',
-    },
-  },
   addButton: {
     position: 'fixed',
     bottom: '20px',
     left: '50%',
     transform: 'translateX(-50%)',
-    padding: '12px 24px',
+    width: '90vw', // Make button longer horizontally
+    maxWidth: '480px', // Limit max width for large screens
+    padding: '16px 0', // More vertical padding, no horizontal padding needed
     backgroundColor: '#00BFA5',
     color: 'white',
     border: 'none',
-    borderRadius: '50px',
-    fontSize: '16px',
-    fontWeight: '600',
+    borderRadius: '32px',
+    fontSize: '20px',
+    fontWeight: '700',
     cursor: 'pointer',
-    boxShadow: '0 4px 12px rgba(0, 191, 165, 0.3)',
+    boxShadow: '0 4px 16px rgba(0, 191, 165, 0.25)',
     zIndex: 1000,
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 0.2s',
+    textAlign: 'center',
+    letterSpacing: '0.5px',
     '&:hover': {
+      backgroundColor: '#00A896',
       transform: 'translateX(-50%) translateY(-4px)',
-      boxShadow: '0 6px 16px rgba(0, 191, 165, 0.4)',
+      boxShadow: '0 8px 24px rgba(0, 191, 165, 0.35)',
     },
     '@media (min-width: 768px)': {
-      padding: '14px 28px',
-      fontSize: '18px',
+      width: '420px',
+      fontSize: '22px',
+      padding: '18px 0',
     },
   },
   modalOverlay: {

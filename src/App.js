@@ -13,6 +13,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import EditProfile from './pages/EditProfile';
+import FamilyGallery from './pages/FamilyGallery';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 
@@ -113,6 +114,12 @@ function App() {
               <Route path="/documents" element={
                 <ProtectedRoute>
                   <Documents />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/family-gallery" element={
+                <ProtectedRoute>
+                  <FamilyGallery />
                 </ProtectedRoute>
               } />
               

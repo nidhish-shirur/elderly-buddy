@@ -27,6 +27,8 @@ import { auth, db } from '../utils/firebase';
 import { doc, getDoc, collection, query, getDocs, where } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import WaterIntake from '../components/WaterIntake';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -600,6 +602,80 @@ const ContentWrapper = styled(Box)(({ theme }) => ({
   }
 }));
 
+const NewsSection = styled(Box)(({ theme }) => ({
+  backgroundColor: '#FFFFFF',
+  padding: '32px 28px',
+  borderRadius: '24px',
+  boxShadow: '0 6px 24px rgba(25, 118, 210, 0.08)',
+  marginTop: '36px',
+  marginBottom: '24px',
+  transition: 'box-shadow 0.2s',
+  '&:hover': {
+    boxShadow: '0 10px 32px rgba(25, 118, 210, 0.13)'
+  },
+  '& .section-header': {
+    marginBottom: '24px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    '& h6': {
+      fontSize: '26px',
+      fontWeight: '700',
+      color: '#1976D2'
+    }
+  },
+  '& .news-list': {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px'
+  },
+  '& .news-item': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '18px',
+    padding: '18px 0',
+    borderBottom: '1px solid #E3F2FD',
+    '&:last-child': {
+      borderBottom: 'none'
+    },
+    background: 'linear-gradient(90deg, #E3F2FD 0%, #FFF 100%)',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(25, 118, 210, 0.04)'
+  },
+  '& .news-thumb': {
+    width: 70,
+    height: 70,
+    borderRadius: '10px',
+    objectFit: 'cover',
+    background: '#F5F7FA',
+    border: '1px solid #E3F2FD',
+    flexShrink: 0
+  },
+  '& .news-title': {
+    fontWeight: 700,
+    fontSize: '17px',
+    color: '#1976D2',
+    textDecoration: 'none',
+    lineHeight: 1.3,
+    display: 'block',
+    marginBottom: '6px',
+    '&:hover': {
+      textDecoration: 'underline',
+      color: '#125ea2'
+    }
+  },
+  '& .news-source': {
+    fontSize: '13px',
+    color: '#888',
+    marginTop: '2px'
+  },
+  '& .news-desc': {
+    fontSize: '15px',
+    color: '#444',
+    margin: '4px 0 0 0'
+  }
+}));
+
 const Home = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -611,6 +687,9 @@ const Home = () => {
   const [medicationReminders, setMedicationReminders] = useState([]);
   const [routineReminders, setRoutineReminders] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [news, setNews] = useState([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const [newsError, setNewsError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -659,6 +738,31 @@ const Home = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const fetchNews = async () => {
+    setNewsLoading(true);
+    setNewsError(null);
+    try {
+      // Use thenewsapi.com instead of newsapi.org
+      const response = await fetch(
+        `https://api.thenewsapi.com/v1/news/top?locale=in&limit=5&api_token=${process.env.REACT_APP_NEWS_API_KEY}`
+      );
+      const data = await response.json();
+      // thenewsapi.com returns articles in data.data
+      if (Array.isArray(data.data) && data.data.length > 0) {
+        setNews(data.data);
+        setNewsError(null);
+      } else {
+        setNews([]);
+        setNewsError('No news articles found.');
+      }
+    } catch (err) {
+      setNewsError('Unable to fetch news at this time.');
+      setNews([]);
+    } finally {
+      setNewsLoading(false);
+    }
+  };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -863,6 +967,10 @@ const Home = () => {
     return text;
   };
 
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
   return (
     <Container>
       <Navbar>
@@ -1010,6 +1118,17 @@ const Home = () => {
               >
                 <span className="button-text">Documents</span>
               </NavButton>
+              <NavButton 
+                onClick={() => navigate('/family-gallery')}
+                startIcon={<FamilyRestroomIcon />}
+                sx={{
+                  backgroundColor: '#FFE4EC', // baby pink
+                  '& .MuiSvgIcon-root': { color: '#F06292' },
+                  '&:hover': { backgroundColor: '#FFE4EC' }
+                }}
+              >
+                <span className="button-text">Family Gallery</span>
+              </NavButton>
             </ButtonGrid>
 
             <EmergencyButton
@@ -1098,6 +1217,68 @@ const Home = () => {
               </Typography>
             )}
           </ReminderSection>
+
+          {/* News Section */}
+          <NewsSection>
+            <Box className="section-header">
+              <NewspaperIcon sx={{ color: '#1976D2', fontSize: 32 }} />
+              <Typography variant="h6">Latest News</Typography>
+            </Box>
+            {newsLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                <CircularProgress size={24} sx={{ color: '#1976D2' }} />
+              </Box>
+            ) : newsError ? (
+              <Typography sx={{ color: '#E74C3C', fontSize: '15px', textAlign: 'center', py: 2 }}>
+                {newsError}
+              </Typography>
+            ) : (
+              <Box className="news-list">
+                {news.length === 0 ? (
+                  <Typography sx={{ color: '#888', fontStyle: 'italic', textAlign: 'center', py: 2 }}>
+                    No news available.
+                  </Typography>
+                ) : (
+                  news.map((article, idx) => (
+                    <Box key={idx} className="news-item">
+                      {article.image_url ? (
+                        <img
+                          src={article.image_url}
+                          alt="news"
+                          className="news-thumb"
+                          loading="lazy"
+                          onError={e => { e.target.style.display = 'none'; }}
+                        />
+                      ) : (
+                        <NewspaperIcon sx={{ color: '#1976D2', fontSize: 44, mt: '4px', mr: 1 }} />
+                      )}
+                      <Box sx={{ flex: 1 }}>
+                        <a
+                          href={article.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="news-title"
+                        >
+                          {article.title}
+                        </a>
+                        {article.description && (
+                          <Typography className="news-desc">
+                            {article.description}
+                          </Typography>
+                        )}
+                        <Typography className="news-source">
+                          {article.source}
+                          {article.published_at && (
+                            <> &middot; {new Date(article.published_at).toLocaleDateString()}</>
+                          )}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))
+                )}
+              </Box>
+            )}
+          </NewsSection>
         </Box>
       </ContentWrapper>
     </Container>

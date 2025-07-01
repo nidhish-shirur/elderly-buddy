@@ -262,7 +262,6 @@ const Profile = () => {
     { title: 'PAN Card', category: 'Identity Documents' },
     { title: 'Prescription', category: 'Medical Records' },
     { title: 'Diabetes Report', category: 'Medical Records' },
-    { title: 'Family Photo 1', category: 'Family Photos' },
   ];
 
   return (
