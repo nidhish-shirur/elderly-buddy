@@ -286,7 +286,7 @@ const Routine = ({ voiceIntent }) => {
         <Link to="/home" style={styles.backButton}>
           <IoArrowBack size={24} />
         </Link>
-        <h1 style={styles.title}>Schedule Today</h1>
+        <h1 style={styles.title}>Upcoming Schedule</h1>
         <button
           onClick={() => speechService.speak(getFullRoutineSpeech(), 1.1, 1.2)}
           style={styles.speakerButton}

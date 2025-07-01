@@ -87,50 +87,71 @@ const MemberGrid = styled(Grid)(({ theme }) => ({
   maxWidth: 1100,
   marginLeft: 'auto',
   marginRight: 'auto',
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0, 1),
   justifyContent: 'center',
+  rowGap: theme.spacing(2),
+  columnGap: theme.spacing(2), // add horizontal gap
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: 400,
+    padding: theme.spacing(0, 0.5),
+    rowGap: theme.spacing(2),
+    columnGap: theme.spacing(2), // add horizontal gap for mobile
+  },
 }));
 
 const MemberCard = styled(Paper)(({ theme }) => ({
-  borderRadius: 22,
-  padding: theme.spacing(3, 2, 2, 2),
+  borderRadius: 20,
+  padding: theme.spacing(2, 1, 1.5, 1),
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  boxShadow: '0 6px 24px rgba(74,111,165,0.13)',
+  boxShadow: '0 4px 16px rgba(74,111,165,0.10)',
   background: 'linear-gradient(135deg, #f8fafc 0%, #e3eafc 100%)',
   position: 'relative',
-  minHeight: 230,
-  transition: 'transform 0.22s, box-shadow 0.22s',
+  minHeight: 180,
+  maxWidth: 170,
+  margin: '0 auto',
+  transition: 'transform 0.22s, box-shadow 0.22s, background 0.22s',
+  border: '1.5px solid #e3eafc',
   '&:hover': {
-    transform: 'translateY(-8px) scale(1.03)',
-    boxShadow: '0 12px 32px rgba(74,111,165,0.18)',
-    background: 'linear-gradient(135deg, #f0f4ff 0%, #e3eafc 100%)',
+    transform: 'translateY(-6px) scale(1.04)',
+    boxShadow: '0 10px 28px rgba(74,111,165,0.16)',
+    background: 'linear-gradient(135deg, #e3eafc 0%, #f8fafc 100%)',
+    borderColor: '#b3c6f7',
   },
   [theme.breakpoints.up('sm')]: {
-    minHeight: 260,
+    minHeight: 240,
+    maxWidth: 220,
+    padding: theme.spacing(3, 2, 2, 2),
   },
 }));
 
 const MemberAvatar = styled(Avatar)(({ theme }) => ({
-  width: 84,
-  height: 84,
+  width: 60,
+  height: 60,
   background: 'linear-gradient(135deg, #b39ddb 0%, #90caf9 100%)',
   color: '#512da8',
-  fontSize: 42,
-  marginBottom: theme.spacing(1.5),
-  boxShadow: '0 2px 12px rgba(74,111,165,0.13)',
-  border: '3px solid #fff',
+  fontSize: 34,
+  marginBottom: theme.spacing(1),
+  boxShadow: '0 2px 8px rgba(74,111,165,0.10)',
+  border: '2px solid #fff',
   cursor: 'pointer',
-  transition: 'transform 0.22s',
-  objectFit: 'cover', // Ensure image fits the avatar
+  transition: 'transform 0.22s, box-shadow 0.22s',
+  objectFit: 'cover',
   '& img': {
-    objectFit: 'cover', // Ensure the img inside Avatar fits
+    objectFit: 'cover',
     width: '100%',
     height: '100%',
   },
   '&:hover': {
-    transform: 'scale(1.08)',
+    transform: 'scale(1.09)',
+    boxShadow: '0 4px 16px rgba(74,111,165,0.18)',
+  },
+  [theme.breakpoints.up('sm')]: {
+    width: 84,
+    height: 84,
+    fontSize: 42,
+    marginBottom: theme.spacing(1.5),
   },
 }));
 
@@ -173,25 +194,28 @@ const RoleChip = styled(Box)(({ theme }) => ({
   color: '#fff',
   borderRadius: 15,
   padding: theme.spacing(0.5, 2),
-  fontSize: 15,
+  fontSize: 14,
   fontWeight: 600,
-  margin: theme.spacing(1, 0, 1.5, 0),
+  margin: theme.spacing(0.5, 0, 1, 0),
   textTransform: 'capitalize',
   letterSpacing: 0.5,
   boxShadow: '0 1px 4px rgba(74,111,165,0.07)',
+  textAlign: 'center',
+  minWidth: 80,
 }));
 
 const BirthdateBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: 8,
+  gap: 6,
   color: '#7b1fa2',
   fontWeight: 500,
-  fontSize: 16,
-  marginTop: theme.spacing(1),
+  fontSize: 14,
+  marginTop: theme.spacing(0.5),
   background: 'rgba(225, 225, 247, 0.18)',
-  padding: theme.spacing(0.5, 1.5),
+  padding: theme.spacing(0.5, 1.2),
   borderRadius: 10,
+  minHeight: 28,
 }));
 
 const BirthdayEmoji = () => <span role="img" aria-label="birthday">🎂</span>;
@@ -226,7 +250,7 @@ const FamilyGallery = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editIdx, setEditIdx] = useState(null);
-  const [form, setForm] = useState({ name: '', role: '', birthdate: '', imageUrl: '' });
+  const [form, setForm] = useState({ name: '', role: '', birthdate  : '', imageUrl: '' });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const navigate = useNavigate();
@@ -384,15 +408,20 @@ const FamilyGallery = () => {
           <CircularProgress size={44} sx={{ color: theme.palette.primary.main }} />
         </Box>
       ) : (
-        <MemberGrid container spacing={3}>
+        <MemberGrid container spacing={2}>
           {(family.length === 0 ? Array(4).fill({}) : family).map((member, idx) => (
             <Grid
               item
-              xs={6} // 2 per row on mobile
+              xs={6}
               sm={4}
               md={4}
               lg={3}
               key={idx}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mb: { xs: 2, sm: 3 }, // add bottom margin for extra vertical space
+              }}
             >
               <MemberCard>
                 <EditButton
@@ -424,7 +453,7 @@ const FamilyGallery = () => {
                     referrerPolicy: "no-referrer"
                   }}
                 >
-                  {!member.imageUrl && getName(member)[0].toUpperCase()}
+                  {!member.imageUrl && getName(member)[0]?.toUpperCase()}
                 </MemberAvatar>
                 <Typography
                   variant="h6"
@@ -432,9 +461,10 @@ const FamilyGallery = () => {
                     fontWeight: 700,
                     color: theme.palette.text.primary,
                     textAlign: 'center',
-                    fontSize: 19,
-                    mt: 1,
+                    fontSize: 16,
+                    mt: 0.5,
                     fontFamily: 'Montserrat, Arial, sans-serif',
+                    lineHeight: 1.2,
                   }}
                 >
                   {getName(member)}
@@ -515,7 +545,7 @@ const FamilyGallery = () => {
           />
           <TextField
             margin="dense"
-            label="Birthdate"
+            label="Birthdate/Anniversary"
             name="birthdate"
             value={form.birthdate}
             onChange={handleFormChange}

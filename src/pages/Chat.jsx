@@ -343,24 +343,36 @@ const Chat = () => {
 
       const response = await chatService.sendMessage(
         userMessage,
-        messages.map(m => ({ role: m.isUser ? 'user' : 'assistant', content: m.text }))
+        messages.map(m => ({ role: m.isUser ? 'user' : 'assistant', content: m.text })),
+        { noMarkdown: true } // Add this option if your backend supports it
       );
 
+      let replyText = response.message;
+      // Remove asterisks used for markdown bold/italic
+      if (typeof replyText === 'string') {
+        replyText = replyText.replace(/\*+/g, '');
+      }
+
       if (response.success) {
-        setMessages(prev => [...prev, { text: response.message, isUser: false }]);
+        setMessages(prev => [...prev, { text: replyText, isUser: false }]);
       } else {
         // Fallback: Try to get a general answer from a public API
         try {
           const fallback = await chatService.generalAnswer(userMessage);
+          let fallbackText = fallback && fallback.message ? fallback.message : '';
+          if (typeof fallbackText === 'string') {
+            fallbackText = fallbackText.replace(/\*+/g, '');
+          }
           if (fallback && fallback.success) {
-            setMessages(prev => [...prev, { text: fallback.message, isUser: false }]);
+            setMessages(prev => [...prev, { text: fallbackText, isUser: false }]);
           } else {
             setMessages(prev => [
               ...prev,
               {
                 text:
-                  fallback?.error ||
-                  "I'm sorry, I couldn't process that request. Please try again.",
+                  fallback?.error
+                    ? fallback.error.replace(/\*+/g, '')
+                    : "I'm sorry, I couldn't process that request. Please try again.",
                 isUser: false
               }
             ]);

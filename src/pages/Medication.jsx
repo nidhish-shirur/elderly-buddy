@@ -11,16 +11,11 @@ import {
   TextField,
   IconButton,
   List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   CircularProgress,
   Alert,
   Paper,
-  MenuItem,
   Divider,
   InputAdornment,
-  Snackbar,
   useMediaQuery,
   useTheme
 } from '@mui/material';
@@ -30,7 +25,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddIcon from '@mui/icons-material/Add';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate } from 'react-router-dom';
@@ -45,13 +39,11 @@ import {
   doc,
   serverTimestamp,
   onSnapshot,
-  orderBy,
   updateDoc
 } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import SpeechButton from '../components/SpeechButton';
 import BarcodeScanner from '../components/BarcodeScanner';
-import WarningIcon from '@mui/icons-material/Warning';
 import CheckBox from '@mui/material/Checkbox';
 
 const Container = styled(Box)(({ theme }) => ({
@@ -72,12 +64,21 @@ const Header = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-  borderRadius: '12px',
+  borderRadius: 0, // Remove rounded corners
   transition: 'box-shadow 0.3s ease',
   marginBottom: '16px',
+  marginLeft: '-12px',
+  marginRight: '-12px',
+  marginTop: '-12px',
+  width: 'calc(100% + 24px)',
   [theme.breakpoints.up('sm')]: {
     padding: '24px',
     marginBottom: '20px',
+    marginLeft: '-20px',
+    marginRight: '-20px',
+    marginTop: '-20px',
+    width: 'calc(100% + 40px)',
+    borderRadius: 0, // Remove rounded corners for larger screens
   },
 }));
 
@@ -114,6 +115,7 @@ const ActionButton = styled(Button)(({ theme }) => ({
   width: '100%',
   minWidth: 0,
   maxWidth: 'none',
+  height: '80px', // Ensure all buttons have the same height
   [theme.breakpoints.up('sm')]: {
     width: '220px',
     minWidth: '220px',
@@ -122,9 +124,11 @@ const ActionButton = styled(Button)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    height: '80px', // Match height for all buttons
   },
   '& .MuiButton-startIcon': {
     marginRight: 8,
+    alignItems: 'flex-start', // Align icon to top if needed
   },
   '&.MuiButton-contained': {
     backgroundColor: '#A0E3E2',

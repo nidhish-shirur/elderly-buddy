@@ -8,8 +8,6 @@ import CloudIcon from '@mui/icons-material/Cloud';
 import ThunderstormIcon from '@mui/icons-material/Thunderstorm';
 import GrainIcon from '@mui/icons-material/Grain';
 import AcUnitIcon from '@mui/icons-material/AcUnit';
-import WbCloudyIcon from '@mui/icons-material/WbCloudy';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import ChatIcon from '@mui/icons-material/Chat';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
@@ -19,7 +17,6 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import InfoIcon from '@mui/icons-material/Info';
 import SpeechButton from '../components/SpeechButton';
@@ -29,6 +26,7 @@ import { useAuth } from '../contexts/AuthContext';
 import WaterIntake from '../components/WaterIntake';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
+import CakeIcon from '@mui/icons-material/Cake';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -191,7 +189,7 @@ const WeatherBox = styled(Paper)(({ theme }) => ({
     }
   },
   '& .tip-text': {
-    fontSize: '14px',
+    fontSize: '17px', // was 14px
     color: '#2C3E50',
     fontWeight: 500,
     lineHeight: 1.4
@@ -676,6 +674,40 @@ const NewsSection = styled(Box)(({ theme }) => ({
   }
 }));
 
+// Birthday Card style
+const BirthdayCard = styled(Box)(({ theme }) => ({
+  background: '#F8BBD0', // light pink
+  color: '#7B1FA2', // deep purple for contrast
+  borderRadius: '28px',
+  padding: '32px 24px',
+  margin: '32px 0 24px 0',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '28px',
+  boxShadow: '0 4px 24px rgba(248,187,208,0.13)',
+  minHeight: '120px',
+  fontSize: '24px',
+  fontWeight: 600,
+  textAlign: 'center',
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    left: 0, top: 0, right: 0, bottom: 0,
+    background: `url("data:image/svg+xml,%3Csvg width='400' height='120' viewBox='0 0 400 120' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='18' fill='%23FFD6E0'/%3E%3Ccircle cx='370' cy='90' r='22' fill='%23FFD6E0' fill-opacity='0.5'/%3E%3Ccircle cx='80' cy='90' r='12' fill='%23F06292'/%3E%3Ccircle cx='320' cy='30' r='14' fill='%23F8BBD0'/%3E%3Ccircle cx='200' cy='60' r='10' fill='%23F06292'/%3E%3Ccircle cx='120' cy='40' r='8' fill='%23F8BBD0'/%3E%3Ccircle cx='270' cy='80' r='8' fill='%23F8BBD0'/%3E%3Crect x='50' y='60' width='18' height='8' fill='%23F8BBD0'/%3E%3Cpolygon points='350,30 360,50 340,50' fill='%23FFD6E0'/%3E%3C/svg%3E") repeat`,
+    opacity: 0.13,
+    zIndex: 0,
+  },
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column',
+    gap: '14px',
+    padding: '20px 10px',
+    fontSize: '18px',
+  },
+}));
+
 const Home = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -690,6 +722,7 @@ const Home = () => {
   const [news, setNews] = useState([]);
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState(null);
+  const [birthdayInfo, setBirthdayInfo] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -736,6 +769,12 @@ const Home = () => {
     fetchWeather();
     const interval = setInterval(fetchWeather, 300000);
 
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetchNews();
+    const interval = setInterval(fetchNews, 3600000); // Refresh every 1 hour
     return () => clearInterval(interval);
   }, []);
 
@@ -971,6 +1010,91 @@ const Home = () => {
     fetchNews();
   }, []);
 
+  useEffect(() => {
+    // Fetch family members' birthdays from Firestore
+    const fetchBirthdays = async () => {
+      if (!currentUser?.uid) return;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        if (!userDoc.exists()) {
+          setBirthdayInfo(null);
+          return;
+        }
+        const familyMembers = userDoc.data().familyMembers || [];
+        if (!familyMembers.length) {
+          setBirthdayInfo(null);
+          return;
+        }
+
+        const today = new Date();
+        let todayBirthdays = [];
+        let nextBirthday = null;
+        let minDiff = Infinity;
+
+        familyMembers.forEach(member => {
+          if (!member.birthdate) return;
+          // Try to parse date (support "YYYY-MM-DD", "DD MMM YYYY", etc.)
+          let bday = new Date(member.birthdate);
+          if (isNaN(bday)) {
+            // Try parsing as "DD MMM YYYY"
+            const parts = member.birthdate.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+            if (parts) {
+              bday = new Date(`${parts[2]} ${parts[1]}, ${parts[3]}`);
+            }
+          }
+          if (isNaN(bday)) return;
+
+          // Set to this year
+          bday.setFullYear(today.getFullYear());
+          // If already passed this year, set to next year
+          if (
+            bday.getMonth() < today.getMonth() ||
+            (bday.getMonth() === today.getMonth() && bday.getDate() < today.getDate())
+          ) {
+            bday.setFullYear(today.getFullYear() + 1);
+          }
+          // Check if today
+          if (
+            bday.getMonth() === today.getMonth() &&
+            bday.getDate() === today.getDate()
+          ) {
+            // Calculate age if possible
+            let age = today.getFullYear() - (parseInt(member.birthdate.slice(-4)) || bday.getFullYear());
+            todayBirthdays.push({ ...member, age });
+          } else {
+            const diff = bday - today;
+            if (diff < minDiff) {
+              minDiff = diff;
+              nextBirthday = { ...member, nextDate: new Date(bday) };
+            }
+          }
+        });
+
+        if (todayBirthdays.length > 0) {
+          setBirthdayInfo({
+            type: 'today',
+            members: todayBirthdays
+          });
+        } else if (nextBirthday) {
+          // Calculate days left
+          const msPerDay = 24 * 60 * 60 * 1000;
+          const daysLeft = Math.ceil((nextBirthday.nextDate - today) / msPerDay);
+          setBirthdayInfo({
+            type: 'upcoming',
+            member: nextBirthday,
+            daysLeft
+          });
+        } else {
+          setBirthdayInfo(null);
+        }
+      } catch (err) {
+        setBirthdayInfo(null);
+      }
+    };
+
+    fetchBirthdays();
+  }, [currentUser]);
+
   return (
     <Container>
       <Navbar>
@@ -1000,7 +1124,14 @@ const Home = () => {
           <GreetingSection>
             <GreetingPattern />
             <GreetingContent>
-              <Typography variant="h4">{getGreeting()}, {userData.firstName}!</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="h4">{getGreeting()}, {userData.firstName}!</Typography>
+                <SpeechButton
+                  text={`${getGreeting()}, ${userData.firstName || 'User'}! ${currentQuote}`}
+                  tooltipText="Listen to greeting and quote"
+                  size="small"
+                />
+              </Box>
               <Typography variant="h6">
                 <FormatQuoteIcon className="quote-icon" />
                 {currentQuote}
@@ -1094,7 +1225,7 @@ const Home = () => {
                   '&:hover': { backgroundColor: '#E8F5E9' }
                 }}
               >
-                <span className="button-text">Daily Routine</span>
+                <span className="button-text">Upcoming Schedule</span>
               </NavButton>
               <NavButton 
                 onClick={() => navigate('/medication')} 
@@ -1139,6 +1270,7 @@ const Home = () => {
             </EmergencyButton>
           </ButtonContainer>
 
+          {/* Reminders Section */}
           <ReminderSection>
             <Box className="section-header" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="h6">Today's Reminders</Typography>
@@ -1188,7 +1320,7 @@ const Home = () => {
                     fontSize: '18px'
                   }}
                 >
-                  Daily Routines
+                  Schedule
                 </Typography>
                 {routineReminders.map((routine) => (
                   <RoutineReminderCard 
@@ -1218,11 +1350,67 @@ const Home = () => {
             )}
           </ReminderSection>
 
+          {/* Birthday Card Section */}
+          {birthdayInfo && birthdayInfo.type === 'today' && (
+            <BirthdayCard>
+              <CakeIcon sx={{ fontSize: 48, color: '#F06292', zIndex: 1 }} />
+              <Box sx={{ zIndex: 1, color: '#7B1FA2' }}>
+                {birthdayInfo.members.length === 1 ? (
+                  <>
+                    It&apos;s <b>{birthdayInfo.members[0].name}</b>
+                    {birthdayInfo.members[0].age
+                      ? `’s ${birthdayInfo.members[0].age}th Birthday!`
+                      : `'s Birthday!`}
+                    <br />
+                    Wish {birthdayInfo.members[0].name.split(' ')[0]} a happy birthday!
+                  </>
+                ) : (
+                  <>
+                    Today is the birthday of{' '}
+                    {birthdayInfo.members.map(m => m.name).join(', ')}!
+                    <br />
+                    Wish them a happy birthday!
+                  </>
+                )}
+              </Box>
+            </BirthdayCard>
+          )}
+          {birthdayInfo && birthdayInfo.type === 'upcoming' && (
+            <BirthdayCard sx={{ background: '#F8BBD0', color: '#7B1FA2' }}>
+              <CakeIcon sx={{ fontSize: 48, color: '#F06292', zIndex: 1 }} />
+              <Box sx={{ zIndex: 1, color: '#7B1FA2' }}>
+                Next birthday: <b>{birthdayInfo.member.name}</b> on{' '}
+                {birthdayInfo.member.nextDate.toLocaleDateString(undefined, {
+                  month: 'long',
+                  day: 'numeric'
+                })}
+                <br />
+                {birthdayInfo.daysLeft === 1
+                  ? 'Just 1 day to go!'
+                  : `In ${birthdayInfo.daysLeft} days`}
+              </Box>
+            </BirthdayCard>
+          )}
+
           {/* News Section */}
           <NewsSection>
             <Box className="section-header">
               <NewspaperIcon sx={{ color: '#1976D2', fontSize: 32 }} />
               <Typography variant="h6">Latest News</Typography>
+              <SpeechButton
+                text={
+                  news.length > 0
+                    ? news
+                        .map(
+                          (article, idx) =>
+                            `News ${idx + 1}: ${article.title}`
+                        )
+                        .join('. ... ')
+                    : 'No news available.'
+                }
+                tooltipText="Listen to latest news headlines"
+                size="small"
+              />
             </Box>
             {newsLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
@@ -1279,6 +1467,7 @@ const Home = () => {
               </Box>
             )}
           </NewsSection>
+          {/* ...existing code... */}
         </Box>
       </ContentWrapper>
     </Container>
