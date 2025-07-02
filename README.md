@@ -105,8 +105,11 @@ Demo Credentials:
 ---
 
 ## 📱 User Interface
-
-
+![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/7ebc789a61fd61fd59fb06150ccda65b2c02012c/WhatsApp%20Image%202025-07-01%20at%2019.47.47_3610bff6.jpg)
+![image alt]()
+![image alt]()
+![image alt]()
+![image alt]()
 ---
 
 ## 👥 Team Members and Contributions
