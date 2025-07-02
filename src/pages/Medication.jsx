@@ -17,7 +17,14 @@ import {
   Divider,
   InputAdornment,
   useMediaQuery,
-  useTheme
+  useTheme,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
@@ -425,6 +432,16 @@ const ConfirmationDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+const daysOfWeek = [
+  { label: 'Sun', value: 'Sunday' },
+  { label: 'Mon', value: 'Monday' },
+  { label: 'Tue', value: 'Tuesday' },
+  { label: 'Wed', value: 'Wednesday' },
+  { label: 'Thu', value: 'Thursday' },
+  { label: 'Fri', value: 'Friday' },
+  { label: 'Sat', value: 'Saturday' },
+];
+
 const Medication = ({ voiceIntent }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -445,7 +462,9 @@ const Medication = ({ voiceIntent }) => {
     quantity: '',
     price: '',
     note: '',
-    id: ''
+    id: '',
+    repeat: 'Everyday',
+    days: [],
   });
   const [editMedication, setEditMedication] = useState({
     name: '',
@@ -454,7 +473,9 @@ const Medication = ({ voiceIntent }) => {
     price: '',
     note: '',
     id: '',
-    type: ''
+    type: '',
+    repeat: 'Everyday',
+    days: [],
   });
   const [interactions, setInteractions] = useState([]);
   const [lowStockMeds, setLowStockMeds] = useState([]);
@@ -485,7 +506,30 @@ const Medication = ({ voiceIntent }) => {
         };
         return getMinutes(a.time) - getMinutes(b.time);
       });
-      setTodaysMedicines(medicines);
+      setTodaysMedicines(
+        medicines.filter(med => {
+          // Backend compatibility: treat missing or unknown repeat as "Everyday"
+          if (!med.repeat || med.repeat === 'Everyday') return true;
+          if (med.repeat === 'Specific Days' && Array.isArray(med.days)) {
+            return med.days.includes(getTodayName());
+          }
+          if (med.repeat === 'Dont Repeat') {
+            // Only show on the day it was created (if createdDate exists)
+            if (med.createdDate) {
+              const today = new Date();
+              const created = new Date(med.createdDate);
+              return (
+                today.getFullYear() === created.getFullYear() &&
+                today.getMonth() === created.getMonth() &&
+                today.getDate() === created.getDate()
+              );
+            }
+            // If no createdDate, fallback to always show (legacy data)
+            return true;
+          }
+          return true;
+        })
+      );
       setTakenMap(takenObj);
       setLoading(false);
     }, (err) => {
@@ -565,6 +609,9 @@ const Medication = ({ voiceIntent }) => {
         name: newMedication.name.trim(),
         note: newMedication.note || '',
         timestamp,
+        repeat: newMedication.repeat || 'Everyday',
+        days: newMedication.repeat === 'Specific Days' ? newMedication.days : [],
+        ...(newMedication.repeat === 'Dont Repeat' ? { createdDate: new Date().toISOString() } : {}),
       };
 
       if (view === 'routine' && timeValid) {
@@ -616,7 +663,9 @@ const Medication = ({ voiceIntent }) => {
         quantity: '',
         price: '',
         note: '',
-        id: ''
+        id: '',
+        repeat: 'Everyday',
+        days: [],
       });
     } catch (err) {
       console.error('Error adding medicine:', err.message);
@@ -646,6 +695,13 @@ const Medication = ({ voiceIntent }) => {
         name: editMedication.name.trim(),
         note: editMedication.note || '',
         timestamp,
+        repeat: editMedication.repeat || 'Everyday',
+        days: editMedication.repeat === 'Specific Days' ? editMedication.days : [],
+        ...(editMedication.repeat === 'Dont Repeat' && !editMedication.createdDate
+          ? { createdDate: new Date().toISOString() }
+          : editMedication.repeat === 'Dont Repeat'
+          ? { createdDate: editMedication.createdDate }
+          : {}),
       };
 
       if (editMedication.type === 'routine') {
@@ -671,7 +727,9 @@ const Medication = ({ voiceIntent }) => {
         price: '',
         note: '',
         id: '',
-        type: ''
+        type: '',
+        repeat: 'Everyday',
+        days: [],
       });
     } catch (err) {
       console.error('Error editing medicine:', err.message);
@@ -783,6 +841,12 @@ const Medication = ({ voiceIntent }) => {
     } catch (err) {
       setError('Failed to update taken status');
     }
+  };
+
+  const getTodayName = () => {
+    return [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    ][new Date().getDay()];
   };
 
   // Handler for voice intent (from Chat)
@@ -969,6 +1033,21 @@ const Medication = ({ voiceIntent }) => {
                       <Box className="medicine-content">
                         <TimeText>
                           <AccessTimeIcon /> {formatTimeForDisplay(medicine.time)}
+                          {medicine.repeat === 'Specific Days' && medicine.days?.length > 0 && (
+                            <Typography sx={{ ml: 2, fontSize: 13, color: '#1976d2', fontWeight: 500 }}>
+                              {medicine.days.join(', ')}
+                            </Typography>
+                          )}
+                          {medicine.repeat === 'Everyday' && (
+                            <Typography sx={{ ml: 2, fontSize: 13, color: '#1976d2', fontWeight: 500 }}>
+                              Everyday
+                            </Typography>
+                          )}
+                          {medicine.repeat === 'Dont Repeat' && (
+                            <Typography sx={{ ml: 2, fontSize: 13, color: '#1976d2', fontWeight: 500 }}>
+                              Doesn't Repeat
+                            </Typography>
+                          )}
                         </TimeText>
                         {medicine.note && (
                           <Typography color="textSecondary" sx={{ fontSize: '16px' }}>{medicine.note}</Typography>
@@ -1177,14 +1256,52 @@ const Medication = ({ voiceIntent }) => {
               />
 
               {view === 'routine' && (
-                <StyledTextField
-                  label="Time"
-                  value={newMedication.time}
-                  onChange={(e) => setNewMedication({ ...newMedication, time: e.target.value })}
-                  fullWidth
-                  type="time"
-                  InputLabelProps={{ shrink: true }}
-                />
+                <>
+                  <StyledTextField
+                    label="Time"
+                    value={newMedication.time}
+                    onChange={(e) => setNewMedication({ ...newMedication, time: e.target.value })}
+                    fullWidth
+                    type="time"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel>Repeat</InputLabel>
+                    <Select
+                      label="Repeat"
+                      value={newMedication.repeat}
+                      onChange={e => setNewMedication({ ...newMedication, repeat: e.target.value, days: [] })}
+                    >
+                      <MenuItem value="Everyday">Everyday</MenuItem>
+                      <MenuItem value="Specific Days">Specific Days</MenuItem>
+                      <MenuItem value="Dont Repeat">Don't Repeat</MenuItem>
+                    </Select>
+                  </FormControl>
+                  {newMedication.repeat === 'Specific Days' && (
+                    <FormGroup row sx={{ mb: 2 }}>
+                      {daysOfWeek.map(day => (
+                        <FormControlLabel
+                          key={day.value}
+                          control={
+                            <Checkbox
+                              checked={newMedication.days.includes(day.value)}
+                              onChange={e => {
+                                const checked = e.target.checked;
+                                setNewMedication(prev => ({
+                                  ...prev,
+                                  days: checked
+                                    ? [...prev.days, day.value]
+                                    : prev.days.filter(d => d !== day.value)
+                                }));
+                              }}
+                            />
+                          }
+                          label={day.label}
+                        />
+                      ))}
+                    </FormGroup>
+                  )}
+                </>
               )}
 
               {view === 'stock' && (
@@ -1334,14 +1451,52 @@ const Medication = ({ voiceIntent }) => {
               />
 
               {editMedication.type === 'routine' && (
-                <StyledTextField
-                  label="Time"
-                  value={editMedication.time}
-                  onChange={(e) => setEditMedication({ ...editMedication, time: e.target.value })}
-                  fullWidth
-                  type="time"
-                  InputLabelProps={{ shrink: true }}
-                />
+                <>
+                  <StyledTextField
+                    label="Time"
+                    value={editMedication.time}
+                    onChange={(e) => setEditMedication({ ...editMedication, time: e.target.value })}
+                    fullWidth
+                    type="time"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                  <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel>Repeat</InputLabel>
+                    <Select
+                      label="Repeat"
+                      value={editMedication.repeat}
+                      onChange={e => setEditMedication({ ...editMedication, repeat: e.target.value, days: [] })}
+                    >
+                      <MenuItem value="Everyday">Everyday</MenuItem>
+                      <MenuItem value="Specific Days">Specific Days</MenuItem>
+                      <MenuItem value="Dont Repeat">Don't Repeat</MenuItem>
+                    </Select>
+                  </FormControl>
+                  {editMedication.repeat === 'Specific Days' && (
+                    <FormGroup row sx={{ mb: 2 }}>
+                      {daysOfWeek.map(day => (
+                        <FormControlLabel
+                          key={day.value}
+                          control={
+                            <Checkbox
+                              checked={editMedication.days.includes(day.value)}
+                              onChange={e => {
+                                const checked = e.target.checked;
+                                setEditMedication(prev => ({
+                                  ...prev,
+                                  days: checked
+                                    ? [...prev.days, day.value]
+                                    : prev.days.filter(d => d !== day.value)
+                                }));
+                              }}
+                            />
+                          }
+                          label={day.label}
+                        />
+                      ))}
+                    </FormGroup>
+                  )}
+                </>
               )}
 
               {editMedication.type === 'stock' && (

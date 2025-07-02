@@ -100,41 +100,36 @@ const MemberGrid = styled(Grid)(({ theme }) => ({
 }));
 
 const MemberCard = styled(Paper)(({ theme }) => ({
-  borderRadius: 20,
-  padding: theme.spacing(2, 1, 1.5, 1),
+  borderRadius: 24,
+  padding: theme.spacing(3, 2, 2, 2),
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  boxShadow: '0 4px 16px rgba(74,111,165,0.10)',
+  boxShadow: '0 8px 32px rgba(74,111,165,0.13)',
   background: 'linear-gradient(135deg, #f8fafc 0%, #e3eafc 100%)',
   position: 'relative',
-  minHeight: 180,
-  maxWidth: 170,
+  minHeight: 240,
+  maxWidth: 240,
   margin: '0 auto',
   transition: 'transform 0.22s, box-shadow 0.22s, background 0.22s',
-  border: '1.5px solid #e3eafc',
+  border: '2px solid #e3eafc',
   '&:hover': {
-    transform: 'translateY(-6px) scale(1.04)',
-    boxShadow: '0 10px 28px rgba(74,111,165,0.16)',
+    transform: 'translateY(-8px) scale(1.045)',
+    boxShadow: '0 12px 36px rgba(74,111,165,0.18)',
     background: 'linear-gradient(135deg, #e3eafc 0%, #f8fafc 100%)',
     borderColor: '#b3c6f7',
-  },
-  [theme.breakpoints.up('sm')]: {
-    minHeight: 240,
-    maxWidth: 220,
-    padding: theme.spacing(3, 2, 2, 2),
   },
 }));
 
 const MemberAvatar = styled(Avatar)(({ theme }) => ({
-  width: 60,
-  height: 60,
+  width: 90,
+  height: 90,
   background: 'linear-gradient(135deg, #b39ddb 0%, #90caf9 100%)',
   color: '#512da8',
-  fontSize: 34,
-  marginBottom: theme.spacing(1),
+  fontSize: 44,
+  marginBottom: theme.spacing(1.5),
   boxShadow: '0 2px 8px rgba(74,111,165,0.10)',
-  border: '2px solid #fff',
+  border: '3px solid #fff',
   cursor: 'pointer',
   transition: 'transform 0.22s, box-shadow 0.22s',
   objectFit: 'cover',
@@ -147,45 +142,33 @@ const MemberAvatar = styled(Avatar)(({ theme }) => ({
     transform: 'scale(1.09)',
     boxShadow: '0 4px 16px rgba(74,111,165,0.18)',
   },
-  [theme.breakpoints.up('sm')]: {
-    width: 84,
-    height: 84,
-    fontSize: 42,
-    marginBottom: theme.spacing(1.5),
+}));
+
+const EditButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  top: 14,
+  left: 14,
+  background: '#fff',
+  boxShadow: '0 2px 8px rgba(74,111,165,0.10)',
+  border: '1.5px solid #e3eafc',
+  zIndex: 2,
+  '&:hover': {
+    background: '#f3f6fa',
+    boxShadow: '0 4px 16px rgba(74,111,165,0.16)',
   },
 }));
 
 const SpeakerIconButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
-  top: 12,
-  right: 12,
-  background: theme.palette.background.paper,
-  boxShadow: '0 2px 6px rgba(74,111,165,0.10)',
+  top: 14,
+  right: 14,
+  background: '#fff',
+  boxShadow: '0 2px 8px rgba(74,111,165,0.10)',
+  border: '1.5px solid #e3eafc',
+  zIndex: 2,
   '&:hover': {
-    background: theme.palette.action.hover,
-  },
-}));
-
-const EditFab = styled(Fab)(({ theme }) => ({
-  position: 'fixed',
-  bottom: theme.spacing(4),
-  right: theme.spacing(4),
-  zIndex: 10,
-  background: '#1976d2',
-  color: '#fff',
-  '&:hover': {
-    background: '#1565c0',
-  },
-}));
-
-const EditButton = styled(IconButton)(({ theme }) => ({
-  position: 'absolute',
-  top: 12,
-  left: 12,
-  background: theme.palette.background.paper,
-  boxShadow: '0 2px 6px rgba(74,111,165,0.10)',
-  '&:hover': {
-    background: theme.palette.action.hover,
+    background: '#f3f6fa',
+    boxShadow: '0 4px 16px rgba(74,111,165,0.16)',
   },
 }));
 
@@ -193,32 +176,43 @@ const RoleChip = styled(Box)(({ theme }) => ({
   background: 'linear-gradient(90deg, #1976d2 0%, #7b1fa2 100%)',
   color: '#fff',
   borderRadius: 15,
-  padding: theme.spacing(0.5, 2),
-  fontSize: 14,
-  fontWeight: 600,
-  margin: theme.spacing(0.5, 0, 1, 0),
+  padding: theme.spacing(0.7, 2),
+  fontSize: 15,
+  fontWeight: 700,
+  margin: theme.spacing(0.7, 0, 1, 0),
   textTransform: 'capitalize',
   letterSpacing: 0.5,
   boxShadow: '0 1px 4px rgba(74,111,165,0.07)',
   textAlign: 'center',
-  minWidth: 80,
+  minWidth: 90,
 }));
 
 const BirthdateBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: 6,
+  gap: 8,
   color: '#7b1fa2',
-  fontWeight: 500,
-  fontSize: 14,
-  marginTop: theme.spacing(0.5),
-  background: 'rgba(225, 225, 247, 0.18)',
-  padding: theme.spacing(0.5, 1.2),
-  borderRadius: 10,
-  minHeight: 28,
+  fontWeight: 600,
+  fontSize: 15,
+  marginTop: theme.spacing(0.7),
+  background: 'rgba(225, 225, 247, 0.22)',
+  padding: theme.spacing(0.7, 1.5),
+  borderRadius: 12,
+  minHeight: 32,
+  justifyContent: 'center',
 }));
 
-const BirthdayEmoji = () => <span role="img" aria-label="birthday">🎂</span>;
+const DeleteButton = styled(Button)(({ theme }) => ({
+  color: '#fff',
+  background: 'linear-gradient(90deg, #e53935 0%, #b71c1c 100%)',
+  fontWeight: 700,
+  borderRadius: 8,
+  textTransform: 'none',
+  boxShadow: '0 2px 8px rgba(229,57,53,0.08)',
+  '&:hover': {
+    background: 'linear-gradient(90deg, #b71c1c 0%, #e53935 100%)',
+  },
+}));
 
 // Helper to check if a URL is a valid image link
 function isValidImageUrl(url) {
@@ -243,6 +237,51 @@ function getDirectImageUrl(url) {
   }
   return url;
 }
+
+const getAge = (birthdate) => {
+  if (!birthdate) return '';
+  // Try to parse "DD MMM YYYY" or "YYYY-MM-DD"
+  let date;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(birthdate)) {
+    date = new Date(birthdate);
+  } else {
+    // Try "DD MMM YYYY"
+    const parts = birthdate.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+    if (parts) {
+      date = new Date(`${parts[2]} ${parts[1]}, ${parts[3]}`);
+    } else {
+      date = new Date(birthdate);
+    }
+  }
+  if (isNaN(date)) return '';
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const m = today.getMonth() - date.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < date.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : '';
+};
+
+// Add BirthdayEmoji component
+const BirthdayEmoji = () => (
+  <span role="img" aria-label="birthday" style={{ fontSize: 20, marginRight: 4 }}>
+    🎂
+  </span>
+);
+
+// Add EditFab styled component
+const EditFab = styled(Fab)(({ theme }) => ({
+  position: 'fixed',
+  bottom: 32,
+  right: 32,
+  zIndex: 100,
+  boxShadow: '0 4px 24px rgba(74,111,165,0.18)',
+  [theme.breakpoints.down('sm')]: {
+    bottom: 18,
+    right: 18,
+  },
+}));
 
 const FamilyGallery = () => {
   const { currentUser } = useAuth();
@@ -351,6 +390,29 @@ const FamilyGallery = () => {
     }
   };
 
+  // Delete family member
+  const handleDeleteMember = async (idx) => {
+    if (!window.confirm('Are you sure you want to delete this family member?')) return;
+    const updatedFamily = family.filter((_, i) => i !== idx);
+    setFamily(updatedFamily);
+    if (currentUser?.uid) {
+      const userRef = doc(db, 'users', currentUser.uid);
+      try {
+        await updateDoc(userRef, { familyMembers: updatedFamily });
+        setSnackbarMessage('Deleted successfully!');
+      } catch (e) {
+        setFamily(family);
+        setSnackbarMessage(`Failed to delete: ${e.message}`);
+        console.error('Error deleting family member:', e);
+      } finally {
+        setSnackbarOpen(true);
+        setDialogOpen(false);
+        setForm({ name: '', role: '', birthdate: '', imageUrl: '' });
+        setEditIdx(null);
+      }
+    }
+  };
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -420,7 +482,7 @@ const FamilyGallery = () => {
               sx={{
                 display: 'flex',
                 justifyContent: 'center',
-                mb: { xs: 2, sm: 3 }, // add bottom margin for extra vertical space
+                mb: { xs: 2, sm: 3 },
               }}
             >
               <MemberCard>
@@ -469,11 +531,32 @@ const FamilyGallery = () => {
                 >
                   {getName(member)}
                 </Typography>
-                <RoleChip>{getRole(member)}</RoleChip>
                 <BirthdateBox>
-                  <BirthdayEmoji />
-                  {getBirthdate(member)}
+                  {/* Age in one line, birthday in another */}
+                  {getAge(member.birthdate) !== '' && (
+                    <span style={{
+                      color: '#444',
+                      fontWeight: 600,
+                      fontSize: 14,
+                      letterSpacing: 0.2,
+                      display: 'block',
+                      textAlign: 'center',
+                      background: '#f3f3fa',
+                      borderRadius: 8,
+                      padding: '2px 8px',
+                      marginBottom: 2,
+                    }}>
+                      {getAge(member.birthdate)} yrs
+                    </span>
+                  )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <BirthdayEmoji />
+                    <span style={{ fontWeight: 700, color: '#7b1fa2', fontSize: 'inherit', marginLeft: 2 }}>
+                      {getBirthdate(member)}
+                    </span>
+                  </Box>
                 </BirthdateBox>
+                <RoleChip>{getRole(member)}</RoleChip>
               </MemberCard>
             </Grid>
           ))}
@@ -488,16 +571,18 @@ const FamilyGallery = () => {
         <AddIcon />
       </EditFab>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700, textAlign: 'center', fontSize: 22 }}>
+        <DialogTitle sx={{ fontWeight: 700, textAlign: 'center', fontSize: 24, color: '#1976d2', letterSpacing: 0.5 }}>
           {editIdx === null ? 'Add Family Member' : 'Edit Family Member'}
         </DialogTitle>
         <DialogContent
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 2,
+            gap: 2.5,
             mt: 1,
             pb: 0,
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e3eafc 100%)',
+            borderRadius: 2,
           }}
         >
           <TextField
@@ -513,12 +598,13 @@ const FamilyGallery = () => {
               sx: {
                 borderRadius: 2,
                 background: '#f8fafc',
-                fontWeight: 600,
-                fontSize: 17,
+                fontWeight: 700,
+                fontSize: 18,
+                letterSpacing: 0.2,
               },
             }}
             InputLabelProps={{
-              sx: { fontWeight: 500, fontSize: 15 },
+              sx: { fontWeight: 600, fontSize: 16 },
             }}
             autoFocus
           />
@@ -534,12 +620,12 @@ const FamilyGallery = () => {
               sx: {
                 borderRadius: 2,
                 background: '#f8fafc',
-                fontWeight: 500,
-                fontSize: 16,
+                fontWeight: 600,
+                fontSize: 17,
               },
             }}
             InputLabelProps={{
-              sx: { fontWeight: 500, fontSize: 15 },
+              sx: { fontWeight: 600, fontSize: 16 },
             }}
             placeholder="e.g. Father, Mother, Sister"
           />
@@ -555,12 +641,12 @@ const FamilyGallery = () => {
               sx: {
                 borderRadius: 2,
                 background: '#f8fafc',
-                fontWeight: 500,
-                fontSize: 16,
+                fontWeight: 600,
+                fontSize: 17,
               },
             }}
             InputLabelProps={{
-              sx: { fontWeight: 500, fontSize: 15 },
+              sx: { fontWeight: 600, fontSize: 16 },
             }}
             placeholder="e.g. 01 Jan 1970"
           />
@@ -576,23 +662,33 @@ const FamilyGallery = () => {
               sx: {
                 borderRadius: 2,
                 background: '#f8fafc',
-                fontWeight: 500,
-                fontSize: 16,
+                fontWeight: 600,
+                fontSize: 17,
               },
             }}
             InputLabelProps={{
-              sx: { fontWeight: 500, fontSize: 15 },
+              sx: { fontWeight: 600, fontSize: 16 },
             }}
             placeholder="Paste image URL (optional)"
           />
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setDialogOpen(false)} sx={{ fontWeight: 600 }}>
-            Cancel
-          </Button>
-          <Button onClick={handleSaveMember} variant="contained" sx={{ fontWeight: 700 }}>
-            Save
-          </Button>
+        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between', background: '#f8fafc' }}>
+          {editIdx !== null && (
+            <DeleteButton
+              onClick={() => handleDeleteMember(editIdx)}
+              startIcon={<span style={{ fontSize: 18, marginRight: 2 }}>🗑️</span>}
+            >
+              Delete
+            </DeleteButton>
+          )}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button onClick={() => setDialogOpen(false)} sx={{ fontWeight: 600 }}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveMember} variant="contained" sx={{ fontWeight: 700 }}>
+              Save
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
       <Snackbar

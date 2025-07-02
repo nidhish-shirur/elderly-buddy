@@ -385,6 +385,8 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [editingContactIndex, setEditingContactIndex] = useState(null);
+  const [editingContact, setEditingContact] = useState({ name: '', relationship: '', phoneNumber: '' });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -512,6 +514,43 @@ const EditProfile = () => {
     }
   };
 
+  // Start editing a contact
+  const handleEditContact = (index) => {
+    setEditingContactIndex(index);
+    setEditingContact({ ...userData.emergencyContacts[index] });
+  };
+
+  // Save edited contact
+  const handleSaveContact = async (index) => {
+    const updatedContacts = [...userData.emergencyContacts];
+    updatedContacts[index] = { ...editingContact };
+    setUserData(prev => ({
+      ...prev,
+      emergencyContacts: updatedContacts
+    }));
+    setEditingContactIndex(null);
+    setEditingContact({ name: '', relationship: '', phoneNumber: '' });
+
+    // Update Firestore immediately after editing
+    try {
+      const userDoc = doc(db, 'users', currentUser.uid);
+      await updateDoc(userDoc, {
+        emergencyContacts: updatedContacts.filter(contact =>
+          contact.name.trim() && contact.phoneNumber.trim() && contact.relationship.trim()
+        )
+      });
+    } catch (error) {
+      setError('Failed to update emergency contact. Please try again.');
+      console.error('Error updating emergency contact:', error);
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEditContact = () => {
+    setEditingContactIndex(null);
+    setEditingContact({ name: '', relationship: '', phoneNumber: '' });
+  };
+
   const genderOptions = ['Male', 'Female', 'Other'];
   const bloodGroupOptions = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
@@ -529,9 +568,9 @@ const EditProfile = () => {
           <AvatarCircle>
             <PersonIcon sx={{ fontSize: '2rem', color: '#8B7355' }} />
           </AvatarCircle>
-          <ChangePhotoButton startIcon={<AddCircleOutlineIcon />}>
+          {/* <ChangePhotoButton startIcon={<AddCircleOutlineIcon />}>
             Change Photo
-          </ChangePhotoButton>
+          </ChangePhotoButton> */}
         </ProfileSection>
 
         {error && (
@@ -687,7 +726,7 @@ const EditProfile = () => {
 
         <EmergencyContactsSection>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '12px' }}>
-            <ContactPhoneIcon sx={{ fontSize: '1.5rem', color: '#2C3E50' }} />
+            <ContactPhoneIcon sx={{ color: '#2C3E50' }} />
             <SectionTitle sx={{ mb: 0, fontSize: '1.25rem' }}>Emergency Contacts</SectionTitle>
           </Box>
           
@@ -697,39 +736,102 @@ const EditProfile = () => {
                 <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600, color: '#2C3E50' }}>
                   Contact {index + 1}
                 </Typography>
-                {index > 0 && (
-                  <DeleteContactButton onClick={() => handleDeleteContact(index)}>
-                    <DeleteOutlineIcon />
-                  </DeleteContactButton>
-                )}
+                <Box>
+                  {editingContactIndex === index ? null : (
+                    <Button
+                      size="small"
+                      sx={{ minWidth: 0, mr: 1, color: '#1976D2', textTransform: 'none' }}
+                      onClick={() => handleEditContact(index)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  {index > 0 && (
+                    <DeleteContactButton onClick={() => handleDeleteContact(index)}>
+                      <DeleteOutlineIcon />
+                    </DeleteContactButton>
+                  )}
+                </Box>
               </Box>
-              <FormField>
-                <InputLabel>Name</InputLabel>
-                <StyledTextField
-                  fullWidth
-                  placeholder="Enter contact name"
-                  value={contact.name}
-                  onChange={(e) => handleEmergencyContactChange(index, 'name', e.target.value)}
-                />
-              </FormField>
-              <FormField>
-                <InputLabel>Relationship</InputLabel>
-                <StyledTextField
-                  fullWidth
-                  placeholder="Enter relationship"
-                  value={contact.relationship}
-                  onChange={(e) => handleEmergencyContactChange(index, 'relationship', e.target.value)}
-                />
-              </FormField>
-              <FormField sx={{ mb: 0 }}>
-                <InputLabel>Phone Number</InputLabel>
-                <StyledTextField
-                  fullWidth
-                  placeholder="Enter phone number"
-                  value={contact.phoneNumber}
-                  onChange={(e) => handleEmergencyContactChange(index, 'phoneNumber', e.target.value)}
-                />
-              </FormField>
+              {editingContactIndex === index ? (
+                <>
+                  <FormField>
+                    <InputLabel>Name</InputLabel>
+                    <StyledTextField
+                      fullWidth
+                      placeholder="Enter contact name"
+                      value={editingContact.name}
+                      onChange={e => setEditingContact({ ...editingContact, name: e.target.value })}
+                    />
+                  </FormField>
+                  <FormField>
+                    <InputLabel>Relationship</InputLabel>
+                    <StyledTextField
+                      fullWidth
+                      placeholder="Enter relationship"
+                      value={editingContact.relationship}
+                      onChange={e => setEditingContact({ ...editingContact, relationship: e.target.value })}
+                    />
+                  </FormField>
+                  <FormField sx={{ mb: 0 }}>
+                    <InputLabel>Phone Number</InputLabel>
+                    <StyledTextField
+                      fullWidth
+                      placeholder="Enter phone number"
+                      value={editingContact.phoneNumber}
+                      onChange={e => setEditingContact({ ...editingContact, phoneNumber: e.target.value })}
+                    />
+                  </FormField>
+                  <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{ background: '#1976D2', color: '#fff', textTransform: 'none' }}
+                      onClick={() => handleSaveContact(index)}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{ textTransform: 'none' }}
+                      onClick={handleCancelEditContact}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </>
+              ) : (
+                <>
+                  <FormField>
+                    <InputLabel>Name</InputLabel>
+                    <StyledTextField
+                      fullWidth
+                      placeholder="Enter contact name"
+                      value={contact.name}
+                      InputProps={{ readOnly: true }}
+                    />
+                  </FormField>
+                  <FormField>
+                    <InputLabel>Relationship</InputLabel>
+                    <StyledTextField
+                      fullWidth
+                      placeholder="Enter relationship"
+                      value={contact.relationship}
+                      InputProps={{ readOnly: true }}
+                    />
+                  </FormField>
+                  <FormField sx={{ mb: 0 }}>
+                    <InputLabel>Phone Number</InputLabel>
+                    <StyledTextField
+                      fullWidth
+                      placeholder="Enter phone number"
+                      value={contact.phoneNumber}
+                      InputProps={{ readOnly: true }}
+                    />
+                  </FormField>
+                </>
+              )}
             </ContactField>
           ))}
           

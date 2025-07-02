@@ -10,7 +10,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ImageIcon from '@mui/icons-material/Image';
 import PersonIcon from '@mui/icons-material/Person';
 import EditIcon from '@mui/icons-material/Edit';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 
 const PageContainer = styled(Box)(({ theme }) => ({
@@ -211,6 +211,7 @@ const DocumentListItem = styled(ListItem)(({ theme }) => ({
 
 const Profile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = useAuth();
   const [userData, setUserData] = useState({
     firstName: '',
@@ -225,6 +226,7 @@ const Profile = () => {
     allergy: '',
     emergencyContacts: [],
   });
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -238,11 +240,47 @@ const Profile = () => {
             dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
             emergencyContacts: data.emergencyContacts || [],
           });
+
+          // Check if profile is incomplete (all fields except documents are empty)
+          const hasPersonal =
+            !!data.firstName ||
+            !!data.lastName ||
+            !!data.age ||
+            !!data.gender ||
+            !!data.dateOfBirth;
+          const hasHealth =
+            !!data.height ||
+            !!data.weight ||
+            !!data.bloodGroup ||
+            !!data.bloodPressure ||
+            !!data.allergy;
+          const hasEmergency = Array.isArray(data.emergencyContacts) && data.emergencyContacts.length > 0;
+
+          if (!hasPersonal && !hasHealth && !hasEmergency) {
+            setProfileIncomplete(true);
+          } else {
+            setProfileIncomplete(false);
+          }
+        } else {
+          setProfileIncomplete(true);
         }
       }
     };
     fetchUserData();
   }, [currentUser]);
+
+  useEffect(() => {
+    // If profile is incomplete and user is not on /edit-profile, /documents, or /profile, redirect to /edit-profile or /profile
+    if (
+      profileIncomplete &&
+      location.pathname !== '/edit-profile' &&
+      location.pathname !== '/documents' &&
+      location.pathname !== '/profile'
+    ) {
+      // Prefer redirecting to /edit-profile for editing, but if not, fallback to /profile
+      navigate('/profile', { replace: true });
+    }
+  }, [profileIncomplete, location.pathname, navigate]);
 
   const formatDate = (date) => {
     if (!date) return '-';

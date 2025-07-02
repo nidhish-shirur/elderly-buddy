@@ -27,6 +27,7 @@ import WaterIntake from '../components/WaterIntake';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import CakeIcon from '@mui/icons-material/Cake';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -774,8 +775,9 @@ const Home = () => {
 
   useEffect(() => {
     fetchNews();
-    const interval = setInterval(fetchNews, 3600000); // Refresh every 1 hour
-    return () => clearInterval(interval);
+    // Remove interval for news refresh
+    // const interval = setInterval(fetchNews, 3600000);
+    // return () => clearInterval(interval);
   }, []);
 
   const fetchNews = async () => {
@@ -870,11 +872,26 @@ const Home = () => {
         where('userId', '==', currentUser.uid)
       );
       const routinesSnapshot = await getDocs(routinesQuery);
-      
-      const reminders = routinesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+
+      // Today's date in YYYY-MM-DD
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+      const reminders = routinesSnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(reminder => {
+          // Show if date is today or "everyday" (case-insensitive)
+          if (!reminder.date) return true; // fallback: show if no date field
+          if (
+            reminder.date.toLowerCase() === 'everyday' ||
+            reminder.date === todayStr
+          ) {
+            return true;
+          }
+          return false;
+        });
 
       // Sort by time: AM first, then PM, and chronologically within each
       reminders.sort((a, b) => {
@@ -910,11 +927,26 @@ const Home = () => {
         where('completed', '==', false)
       );
       const routinesSnapshot = await getDocs(routinesQuery);
-      
-      const reminders = routinesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+
+      // Today's date in YYYY-MM-DD
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+      const reminders = routinesSnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(reminder => {
+          // Show if date is today or "everyday" (case-insensitive)
+          if (!reminder.date) return true; // fallback: show if no date field
+          if (
+            reminder.date.toLowerCase() === 'everyday' ||
+            reminder.date === todayStr
+          ) {
+            return true;
+          }
+          return false;
+        });
 
       // Sort by time: AM first, then PM, and chronologically within each
       reminders.sort((a, b) => {
@@ -1397,6 +1429,20 @@ const Home = () => {
             <Box className="section-header">
               <NewspaperIcon sx={{ color: '#1976D2', fontSize: 32 }} />
               <Typography variant="h6">Latest News</Typography>
+              <IconButton
+                aria-label="Refresh news"
+                onClick={fetchNews}
+                sx={{
+                  ml: 1,
+                  color: '#1976D2',
+                  background: '#E3F2FD',
+                  borderRadius: '50%',
+                  '&:hover': { background: '#BBDEFB' },
+                  fontSize: 22
+                }}
+              >
+                <RefreshIcon />
+              </IconButton>
               <SpeechButton
                 text={
                   news.length > 0
@@ -1467,7 +1513,6 @@ const Home = () => {
               </Box>
             )}
           </NewsSection>
-          {/* ...existing code... */}
         </Box>
       </ContentWrapper>
     </Container>

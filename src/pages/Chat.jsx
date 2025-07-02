@@ -8,15 +8,25 @@ import {
   Typography,
   CircularProgress,
   Button,
-  Chip
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import AlarmIcon from '@mui/icons-material/Alarm';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { chatService } from '../utils/chatService';
 import SpeechButton from '../components/SpeechButton';
+import { useAuth } from '../contexts/AuthContext';
+import { collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../utils/firebase';
 
 const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -280,12 +290,64 @@ const fetchNewsHeadlines = async () => {
   }
 };
 
+// Helper: Parse time and date from input like "9pm", "9:30pm", "21:00", "8 am", "9 pm tomorrow", "7 pm today"
+function parseTimeAndDate(input) {
+  if (!input) return { time: '', date: 'everyday' };
+  let str = input.trim().toLowerCase();
+  let date = 'everyday';
+
+  // Use regex to extract time and date keywords
+  // e.g. "9 pm tomorrow", "7:30 am today"
+  const dateMatch = str.match(/\b(today|tomorrow)\b/);
+  if (dateMatch) {
+    if (dateMatch[1] === 'tomorrow') {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      date = tomorrow.toISOString().split('T')[0];
+    } else if (dateMatch[1] === 'today') {
+      const today = new Date();
+      date = today.toISOString().split('T')[0];
+    }
+    // Remove the date keyword from the string for time parsing
+    str = str.replace(dateMatch[1], '').trim();
+  }
+
+  // Remove all spaces for time parsing
+  let timeStr = str.replace(/\s+/g, '');
+
+  // If already in HH:mm 24-hour format
+  if (/^\d{1,2}:\d{2}$/.test(timeStr)) return { time: timeStr, date };
+
+  // If in "9pm" or "9:30pm"
+  const match = timeStr.match(/^(\d{1,2})(?::(\d{2}))?(am|pm)$/);
+  if (match) {
+    let hour = parseInt(match[1], 10);
+    let min = match[2] ? parseInt(match[2], 10) : 0;
+    const ampm = match[3];
+    if (ampm === 'pm' && hour < 12) hour += 12;
+    if (ampm === 'am' && hour === 12) hour = 0;
+    return { time: `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`, date };
+  }
+  // If in "21:00" or "9:00"
+  const match24 = timeStr.match(/^(\d{1,2})(?::(\d{2}))?$/);
+  if (match24) {
+    let hour = parseInt(match24[1], 10);
+    let min = match24[2] ? parseInt(match24[2], 10) : 0;
+    return { time: `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`, date };
+  }
+  return { time: '', date };
+}
+
 const Chat = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
+  const [reminderDialogOpen, setReminderDialogOpen] = useState(false);
+  const [pendingReminder, setPendingReminder] = useState(null);
+  const [reminderSnackbar, setReminderSnackbar] = useState(false);
   const chatContainerRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -320,8 +382,91 @@ const Chat = () => {
     handleSendMessage(question);
   };
 
+  // Helper: Detect if reminder is for medication
+  const isMedicationReminder = (text) => {
+    return /medicin(e|es)|tablet|pill|dose|capsule|syrup|injection/i.test(text);
+  };
+
+  const handleConfirmReminder = async () => {
+    if (!currentUser || !pendingReminder) return;
+    try {
+      // Use date from pendingReminder if present, otherwise parse from time string
+      let time = '';
+      let date = 'everyday';
+      if (pendingReminder.date) {
+        time = pendingReminder.time;
+        date = pendingReminder.date;
+      } else {
+        const parsed = parseTimeAndDate(pendingReminder.time);
+        time = parsed.time;
+        date = parsed.date;
+      }
+      if (!time) {
+        alert('Invalid time format. Please specify a time like "9:00 pm", "21:00", "9 pm tomorrow", or "9 pm today".');
+        setReminderDialogOpen(false);
+        setPendingReminder(null);
+        return;
+      }
+      if (isMedicationReminder(pendingReminder.text)) {
+        await addDoc(collection(db, 'medicineRoutines'), {
+          userId: currentUser.uid,
+          name: pendingReminder.text,
+          time,
+          note: '',
+          timestamp: serverTimestamp(),
+        });
+      } else {
+        await addDoc(collection(db, 'routines'), {
+          userId: currentUser.uid,
+          task: pendingReminder.text,
+          time,
+          date,
+          completed: false,
+          createdAt: serverTimestamp(),
+        });
+      }
+      setReminderDialogOpen(false);
+      setReminderSnackbar(true);
+      setPendingReminder(null);
+    } catch (err) {
+      setReminderDialogOpen(false);
+      setPendingReminder(null);
+      alert('Failed to set reminder. Please try again.');
+    }
+  };
+
+  // Delete reminder
+  const handleDeleteReminder = async (reminder) => {
+    if (!currentUser) return;
+    const collectionName = reminder.type === 'medicine' ? 'medicineRoutines' : 'routines';
+    try {
+      await deleteDoc(doc(db, collectionName, reminder.id));
+    } catch (err) {
+      alert('Failed to delete reminder.');
+    }
+  };
+
+  // Regex for simple "remind me" detection (improved)
+  const reminderRegex = /remind me to (.+?) at (\d{1,2}(?::\d{2})?\s?(?:am|pm)?)/i;
+
   const handleSendMessage = async (messageText = newMessage) => {
     if (!messageText.trim()) return;
+
+    // Regex for "remind me to ... at ..."
+    const reminderRegex = /remind me to (.+?) at ([\w: ]+(?:am|pm)?(?: today| tomorrow)?)/i;
+    const match = messageText.match(reminderRegex);
+    if (match) {
+      // Parse time and date for dialog
+      const { time, date } = parseTimeAndDate(match[2].trim());
+      setPendingReminder({
+        text: match[1].trim(),
+        time: time || match[2].trim(),
+        date
+      });
+      setReminderDialogOpen(true);
+      setNewMessage('');
+      return;
+    }
 
     const userMessage = messageText;
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
@@ -533,6 +678,38 @@ const Chat = () => {
           <SendIcon sx={{ fontSize: '20px' }} />
         </SendButton>
       </InputContainer>
+
+      {/* Reminder Confirmation Dialog */}
+      <Dialog open={reminderDialogOpen} onClose={() => setReminderDialogOpen(false)}>
+        <DialogTitle>Set Reminder</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Do you want to set a reminder to <b>{pendingReminder?.text}</b> at <b>{pendingReminder?.time}</b>
+            {pendingReminder?.date && pendingReminder.date !== 'everyday' && (
+              <> on <b>{pendingReminder.date}</b></>
+            )}?
+            <br />
+            <span style={{ color: '#888', fontSize: 13 }}>
+              This will be saved in <b>
+                {pendingReminder && isMedicationReminder(pendingReminder.text) ? 'Medication' : 'Daily Routines'}
+              </b>
+            </span>
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReminderDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirmReminder} variant="contained">Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reminder Snackbar */}
+      <Snackbar
+        open={reminderSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setReminderSnackbar(false)}
+        message="Reminder set successfully!"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Container>
   );
 };

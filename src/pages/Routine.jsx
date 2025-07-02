@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { auth, db } from '../utils/firebase';
-import { collection, query, where, getDocs, addDoc, Timestamp, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, Timestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { IoArrowBack } from 'react-icons/io5';
 import { IoVolumeHighOutline } from 'react-icons/io5';
 import { IoCheckmarkCircle, IoEllipseOutline } from 'react-icons/io5';
@@ -280,6 +280,26 @@ const Routine = ({ voiceIntent }) => {
     </div>
   );
 
+  // Update delete handler to actually delete from Firestore
+  const handleDeleteRoutine = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user || !selectedRoutine) {
+        console.error('No user or routine found');
+        return;
+      }
+      if (!window.confirm('Are you sure you want to delete this routine?')) return;
+      await deleteDoc(doc(db, 'routines', selectedRoutine.id)); // Hard delete
+      await loadRoutines(user.uid);
+      setShowEditModal(false);
+      setSelectedRoutine(null);
+      setEditRoutine({ task: '', time: '', date: '' });
+    } catch (error) {
+      console.error('Error deleting routine:', error);
+      alert('Error deleting routine: ' + error.message);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -482,6 +502,13 @@ const Routine = ({ voiceIntent }) => {
                   Cancel
                 </button>
                 <button 
+                  type="button"
+                  onClick={handleDeleteRoutine}
+                  style={{ ...styles.cancelButton, backgroundColor: '#ffebee', color: '#c62828' }}
+                >
+                  Delete
+                </button>
+                <button 
                   type="submit" 
                   style={styles.submitButton}
                 >
@@ -503,6 +530,7 @@ const styles = {
     margin: '0 auto',
     minHeight: '100vh',
     backgroundColor: '#f9fafb',
+    fontSize: '17px',
     '@media (min-width: 768px)': {
       padding: '24px',
       maxWidth: '700px',
@@ -517,7 +545,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: '24px',
-    paddingBottom: '12px',
+    paddingBottom: '10px',
     borderBottom: '1px solid #e5e7eb',
     '@media (min-width: 768px)': {
       marginBottom: '32px',
@@ -545,14 +573,14 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontSize: '24px',
+    fontSize: '22px',
     fontWeight: '700',
     color: '#1f2937',
     '@media (min-width: 600px)': {
-      fontSize: '28px',
+      fontSize: '26px',
     },
     '@media (min-width: 1024px)': {
-      fontSize: '32px',
+      fontSize: '28px',
     },
   },
   speakerButton: {
@@ -577,33 +605,34 @@ const styles = {
     },
   },
   section: {
-    marginBottom: '24px',
+    marginBottom: '20px',
     '@media (min-width: 768px)': {
-      marginBottom: '32px',
+      marginBottom: '28px',
     },
   },
   sectionTitle: {
-    fontSize: '20px',
+    fontSize: '18px',
     fontWeight: '600',
     color: '#1f2937',
-    marginBottom: '16px',
-    paddingBottom: '8px',
+    marginBottom: '14px',
+    paddingBottom: '6px',
     borderBottom: '2px solid #e5e7eb',
     '@media (min-width: 600px)': {
-      fontSize: '22px',
-      marginBottom: '20px',
+      fontSize: '20px',
+      marginBottom: '18px',
     },
     '@media (min-width: 1024px)': {
-      fontSize: '24px',
-      marginBottom: '24px',
+      fontSize: '22px',
+      marginBottom: '20px',
     },
   },
   emptyState: {
     textAlign: 'center',
-    padding: '24px',
+    padding: '18px',
     backgroundColor: '#f3f4f6',
-    borderRadius: '12px',
+    borderRadius: '10px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+    fontSize: '16px',
   },
   emptyStateText: {
     fontSize: '16px',
@@ -619,9 +648,9 @@ const styles = {
   routineList: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: '10px',
     '@media (min-width: 768px)': {
-      gap: '16px',
+      gap: '14px',
     },
   },
   routineItem: {
@@ -633,6 +662,7 @@ const styles = {
     borderRadius: '10px',
     boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    fontSize: '16px',
     '&:hover': {
       transform: 'translateY(-2px)',
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
@@ -645,7 +675,7 @@ const styles = {
   routineLeft: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
   },
   routineTextContainer: {
     display: 'flex',
@@ -655,7 +685,7 @@ const styles = {
   },
   routineText: {
     fontSize: '16px',
-    fontWeight: '400',
+    fontWeight: '500',
     transition: 'all 0.2s ease',
     wordBreak: 'break-word',
     '@media (min-width: 600px)': {
@@ -668,7 +698,7 @@ const styles = {
   routineTime: {
     fontSize: '14px',
     color: '#00BFA5',
-    fontWeight: '500',
+    fontWeight: '600',
     marginTop: '2px',
     wordBreak: 'break-word',
     '@media (min-width: 600px)': {
@@ -720,9 +750,9 @@ const styles = {
     bottom: '20px',
     left: '50%',
     transform: 'translateX(-50%)',
-    width: '90vw', // Make button longer horizontally
-    maxWidth: '480px', // Limit max width for large screens
-    padding: '16px 0', // More vertical padding, no horizontal padding needed
+    width: '90vw',
+    maxWidth: '480px',
+    padding: '16px 0',
     backgroundColor: '#00BFA5',
     color: 'white',
     border: 'none',
@@ -766,6 +796,7 @@ const styles = {
     maxWidth: '400px',
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
     animation: 'slideUp 0.3s ease-out',
+    fontSize: '16px',
     '@media (min-width: 768px)': {
       padding: '24px',
       maxWidth: '500px',
@@ -782,39 +813,29 @@ const styles = {
       marginBottom: '24px',
     },
   },
-  formGroup: {
-    marginBottom: '16px',
-    '@media (min-width: 768px)': {
-      marginBottom: '20px',
-    },
-  },
   label: {
-    display: 'block',
-    marginBottom: '8px',
-    fontSize: '16px',
-    color: '#374151',
+    fontSize: '15px',
     fontWeight: '500',
-    '@media (min-width: 768px)': {
-      fontSize: '18px',
-    },
+    color: '#374151',
+    marginBottom: '8px',
+    display: 'block',
   },
   input: {
-    width: '100%',
-    padding: '12px',
-    border: '2px solid #d1d5db',
+    fontSize: '14px',
+    padding: '10px',
     borderRadius: '8px',
-    fontSize: '16px',
-    backgroundColor: '#fff',
+    border: '1px solid #d1d5db',
+    marginBottom: '12px',
+    width: '100%',
     boxSizing: 'border-box',
-    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+    transition: 'border-color 0.2s',
     '&:focus': {
       borderColor: '#00BFA5',
-      boxShadow: '0 0 0 3px rgba(0, 191, 165, 0.2)',
       outline: 'none',
     },
-    '@media (min-width: 768px)': {
-      padding: '14px',
-    },
+  },
+  formGroup: {
+    marginBottom: '16px',
   },
   dateContainer: {
     display: 'flex',
@@ -822,82 +843,62 @@ const styles = {
     gap: '8px',
     '@media (min-width: 768px)': {
       flexDirection: 'row',
-      alignItems: 'center',
       gap: '12px',
     },
   },
   quickDateButtons: {
     display: 'flex',
-    gap: '8px',
-    '@media (min-width: 768px)': {
-      gap: '12px',
-    },
+    gap: '6px',
+    flexWrap: 'wrap',
   },
   quickDateButton: {
-    padding: '8px 16px',
-    border: '2px solid #d1d5db',
-    borderRadius: '8px',
-    backgroundColor: 'white',
+    flex: '1 1 auto',
+    padding: '8px',
+    backgroundColor: '#e5e7eb',
     color: '#374151',
+    border: 'none',
+    borderRadius: '8px',
     fontSize: '14px',
     fontWeight: '500',
     cursor: 'pointer',
-    transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
+    transition: 'background-color 0.2s',
     '&:hover': {
-      backgroundColor: '#e5e7eb',
-      borderColor: '#00BFA5',
-      transform: 'translateY(-2px)',
-    },
-    '@media (min-width: 768px)': {
-      padding: '10px 20px',
-      fontSize: '16px',
+      backgroundColor: '#d1d5db',
     },
   },
   modalButtons: {
     display: 'flex',
     justifyContent: 'flex-end',
-    gap: '12px',
-    marginTop: '20px',
-    '@media (min-width: 768px)': {
-      gap: '16px',
-      marginTop: '24px',
-    },
+    gap: '8px',
+    marginTop: '10px',
   },
   cancelButton: {
-    padding: '12px 24px',
-    border: 'none',
-    borderRadius: '8px',
-    backgroundColor: '#f3f4f6',
+    padding: '10px 14px',
+    backgroundColor: 'transparent',
     color: '#374151',
-    cursor: 'pointer',
-    fontSize: '16px',
+    border: '1px solid #d1d5db',
+    borderRadius: '8px',
+    fontSize: '14px',
     fontWeight: '500',
-    transition: 'background-color 0.2s ease, transform 0.2s ease',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s, color 0.2s',
     '&:hover': {
-      backgroundColor: '#e5e7eb',
-      transform: 'translateY(-2px)',
-    },
-    '@media (min-width: 768px)': {
-      padding: '14px 28px',
+      backgroundColor: '#f3f4f6',
     },
   },
   submitButton: {
-    padding: '12px 24px',
-    border: 'none',
-    borderRadius: '8px',
+    padding: '10px 14px',
     backgroundColor: '#00BFA5',
     color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '700',
     cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: '600',
-    transition: 'background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
+    transition: 'background-color 0.2s, transform 0.2s',
     '&:hover': {
       backgroundColor: '#00A896',
       transform: 'translateY(-2px)',
-      boxShadow: '0 4px 12px rgba(0, 191, 165, 0.3)',
-    },
-    '@media (min-width: 768px)': {
-      padding: '14px 28px',
     },
   },
 };
