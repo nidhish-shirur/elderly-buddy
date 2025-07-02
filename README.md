@@ -93,7 +93,7 @@ The app integrates an AI chatbot, health reminders, real-time weather/news updat
 ## 🚀 Deployment Link
 https://elderly-buddy.vercel.app/
 
-Demo Credentials:
+- Demo Credentials:
     - Email: user1@gmail.com
     - Password: user1234
 
@@ -121,6 +121,7 @@ Demo Credentials:
   - UI/UX design
   - Testing
   - Deployment
+  - Walkthrough video
 
 - **Neha Bhatia**
   - Figma prototype
@@ -128,6 +129,7 @@ Demo Credentials:
   - Weather and News API integration
   - Testing
   - Project Presentation
+  - Walkthrough video
 
 ---
 
