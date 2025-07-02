@@ -1,70 +1,156 @@
-# Getting Started with Create React App
+# 👵 Elderly Buddy
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Elderly Buddy** is a user-friendly React-based web application designed to assist elderly users in managing their daily routines, medication, health information, and family gallery.  
+The app integrates an AI chatbot, health reminders, real-time weather/news updates, and emergency contact access to promote safety and independence.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🧰 Technology Stack
 
-### `npm start`
+### 🔹 Frontend
+- **React.js (v19.1.0)** – Dynamic and responsive UI framework  
+- **Material-UI (MUI v7)** – Modern component library  
+- **React Router (v6.21.1)** – Efficient navigation and routing  
+- **Emotion** – CSS-in-JS styling for components  
+- **React Icons** – Scalable vector icons
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🔹 Backend & Database
+- **Firebase (v10.7.1)** – Authentication, Firestore (database), and Storage
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🔹 Additional Libraries
+- **Axios** – HTTP client for API requests  
+- **date-fns** – Lightweight date utility library  
+- **React Firebase Hooks** – Simplified Firebase integration
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🌐 External APIs Used
 
-### `npm run build`
+- **TheNewsAPI** – For showing live news headlines on the dashboard  
+- **WeatherAPI.com** – To fetch real-time weather updates  
+- **OpenRouter (DeepSeek R1 Model)** – Chatbot responses using a free LLM  
+- **Web Speech API** – Native browser API for speech synthesis (text-to-voice)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ✨ Features
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- 🔐 **Login/Registration** – Secure sign-up/login via Firebase  
+- 👤 **Profile Page** – View and edit personal and health information  
+- 🏠 **Home Dashboard** – Centralized access to reminders and tools  
+- 💬 **Greeting & Tip** – Daily greeting with wellness advice  
+- 🌦️ **Weather Widget** – Real-time local weather  
+- 💧 **Water Tracker** – Log daily water intake  
+- 📅 **Today's Reminders** – Daily meds and schedule overview  
+- 🎉 **Birthday/Anniversary Reminder** – Alerts for special occasions  
+- 📰 **Latest News** – Daily news with images and timestamps  
+- 🤖 **Chat Assistant** – Ask questions to an AI-powered assistant  
+- 📆 **Upcoming Schedule** – View your day's planned tasks  
+- 💊 **Medication Tracker** – View meds by time, stock, and routine  
+- 📸 **Family Gallery** – Photos of loved ones with dates and relation  
+- 🚨 **Emergency SOS** – One-tap access to emergency contacts  
+- ♿ **Accessibility Friendly** – Large fonts and high-contrast UI
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🛠️ Setup and Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/nidhish-shirur/elderly-buddy.git
+   cd elderly-buddy
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. **Environment Setup**
+   - Create a `.env` file in the root directory
+   - Add the following configurations:
+     ```
+     REACT_APP_FIREBASE_API_KEY=AIzaSyCAnifgRO9VnKHGxiQXBo1VWZT1v_27oUg
+     REACT_APP_FIREBASE_AUTH_DOMAIN=elderlyassistant-31e55.firebaseapp.com
+     REACT_APP_FIREBASE_PROJECT_ID=elderlyassistant-31e55
+     REACT_APP_FIREBASE_STORAGE_BUCKET=elderlyassistant-31e55.appspot.com
+     REACT_APP_FIREBASE_MESSAGING_SENDER_ID=568035993669
+     REACT_APP_FIREBASE_APP_ID=1:568035993669:web:08d64f93807de09ab65b2c
+     ```
 
-## Learn More
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 🚀 Deployment Link
+https://elderly-buddy.vercel.app/
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Demo Credentials:
+    - Email: user1@gmail.com
+    - Password: user1234
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📊 System Architecture
 
-### Making a Progressive Web App
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 📱 User Interface
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 👥 Team Members and Contributions
 
-### `npm run build` fails to minify
+- **Nidhish Shirur**
+  - Figma prototype
+  - Firebase integration
+  - Chatbot and voice integration
+  - UI/UX design
+  - Testing
+  - Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Neha Bhatia**
+  - Figma prototype
+  - UI/UX design
+  - Weather and News API integration
+  - Testing
+  - Project Presentation
+
+---
+
+## 🔮 Future Roadmap
+
+- **Nearby Facilities** – Show nearest hospitals and pharmacies
+- **Document Uploads** – Upload and organize reports & prescriptions
+- **Multilingual Support** – Interface in regional languages
+- **Barcode Scanner** – Scan medicines for quick info
+- **Video Chat** – Connect with family or doctors
+- **Expense Tracker** – Log medical and home expenses
+- **Voice Assistant** – Hands-free voice-based navigation
+- **Diet Planner** – Suggest meals based on health data
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](issues-link).
+
+## 📧 Contact
+
+For any queries or support, please contact:
+- Nidhish Shirur: shirurnidhish2005@gmail.com
+- Neha Bhatia: discovernehabhatia@gmail.com
