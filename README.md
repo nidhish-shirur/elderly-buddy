@@ -100,7 +100,7 @@ Demo Credentials:
 ---
 
 ## 📊 System Architecture
-
+![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/2ffdfda4788b6068489b3300ef97e099677ab60c/ElderlyBuddy%20(1).png)
 
 ---
 
