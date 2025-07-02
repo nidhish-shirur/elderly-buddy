@@ -106,10 +106,10 @@ Demo Credentials:
 
 ## 📱 User Interface
 ![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/7ebc789a61fd61fd59fb06150ccda65b2c02012c/WhatsApp%20Image%202025-07-01%20at%2019.47.47_3610bff6.jpg)
-![image alt]()
-![image alt]()
-![image alt]()
-![image alt]()
+![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-01%20at%2019.47.48_6f661f36.jpg)
+![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-01%20at%2019.52.46_c4f8797a.jpg)
+![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-02%20at%2016.57.46_b5aa1c4b.jpg)
+![image alt](https://github.com/nidhish-shirur/elderly-buddy/blob/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-02%20at%2016.58.25_353b924a.jpg)
 ---
 
 ## 👥 Team Members and Contributions
