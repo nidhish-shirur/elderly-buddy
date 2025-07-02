@@ -110,6 +110,8 @@ https://elderly-buddy.vercel.app/
 <img src="https://raw.githubusercontent.com/nidhish-shirur/elderly-buddy/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-01%20at%2019.52.46_c4f8797a.jpg" alt="Mobile Screenshot 2" width="250" style="display: block; margin: 0 auto;">
 <img src="https://raw.githubusercontent.com/nidhish-shirur/elderly-buddy/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-02%20at%2016.57.46_b5aa1c4b.jpg" alt="Mobile Screenshot 3" width="250" style="display: block; margin: 0 auto;">
 <img src="https://raw.githubusercontent.com/nidhish-shirur/elderly-buddy/512093819b05b731183fd177c0492ed34ffa9338/WhatsApp%20Image%202025-07-02%20at%2016.58.25_353b924a.jpg" alt="Mobile Screenshot 4" width="250" style="display: block; margin: 0 auto;">
+
+- **Family member picture uploading:** https://youtu.be/Qi08Dhf3Tig
 ---
 
 ## 👥 Team Members and Contributions
