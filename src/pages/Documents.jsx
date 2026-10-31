@@ -133,6 +133,8 @@ const documentCategories = [
   'Other'
 ];
 
+const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024;
+
 const Documents = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -150,7 +152,6 @@ const Documents = () => {
   });
   const [search, setSearch] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [futureScopeDialogOpen, setFutureScopeDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchDocuments();
@@ -229,15 +230,82 @@ const Documents = () => {
   };
 
   const handleUpload = async () => {
-    setFutureScopeDialogOpen(true);
-    // Do not proceed with upload logic
+    if (!currentUser?.uid) {
+      setError('You must be signed in to upload documents');
+      return;
+    }
+    if (!newDocument.file) {
+      setError('Please select a file to upload');
+      return;
+    }
+    if (!newDocument.name.trim()) {
+      setError('Please enter a document name');
+      return;
+    }
+    if (newDocument.file.size > MAX_DOCUMENT_SIZE) {
+      setError('The selected file exceeds the 10 MB upload limit');
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+    setIsUploading(true);
+
+    const originalName = newDocument.file.name;
+    const extension = originalName.includes('.')
+      ? originalName.substring(originalName.lastIndexOf('.')).toLowerCase()
+      : '';
+    const uniqueId = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const fileName = `${uniqueId}${extension}`;
+    const filePath = `documents/${currentUser.uid}/${fileName}`;
+    const storageRef = ref(storage, filePath);
+
+    try {
+      const fileUrl = await uploadFileAndGetURL(
+        storageRef,
+        newDocument.file,
+        setUploadProgress
+      );
+
+      await addDoc(collection(db, 'documents'), {
+        userId: currentUser.uid,
+        name: newDocument.name.trim(),
+        category: newDocument.category,
+        fileName,
+        originalFileName: originalName,
+        filePath,
+        fileUrl,
+        size: newDocument.file.size,
+        mimeType: newDocument.file.type || 'application/octet-stream',
+        timestamp: serverTimestamp()
+      });
+
+      setSuccess('Document uploaded successfully');
+      closeUploadDialog();
+      await fetchDocuments();
+    } catch (uploadError) {
+      console.error('Upload error:', uploadError);
+      setError(uploadError.message || 'Failed to upload document');
+      setIsUploading(false);
+      setUploadProgress(0);
+      try {
+        await deleteObject(storageRef);
+      } catch (cleanupError) {
+        console.warn('Uploaded file cleanup was not completed:', cleanupError);
+      }
+    }
   };
 
   const handleDelete = async (document) => {
     if (window.confirm('Are you sure you want to delete this document?')) {
       try {
         // Delete from Storage
-        const storageRef = ref(storage, `documents/${currentUser.uid}/${document.fileName}`);
+        const storageRef = ref(
+          storage,
+          document.filePath || `documents/${currentUser.uid}/${document.fileName}`
+        );
         await deleteObject(storageRef);
 
         // Delete from Firestore
@@ -258,7 +326,7 @@ const Documents = () => {
 
   // Download handler
   const handleDownload = (document) => {
-    const link = document.createElement('a');
+    const link = window.document.createElement('a');
     link.href = document.fileUrl;
     link.download = document.fileName;
     link.target = '_blank';
@@ -471,26 +539,6 @@ const Documents = () => {
           </DialogActions>
         </Dialog>
 
-        {/* Future Scope Dialog */}
-        <Dialog
-          open={futureScopeDialogOpen}
-          onClose={() => setFutureScopeDialogOpen(false)}
-          PaperProps={{ sx: { borderRadius: 4, minWidth: 300 } }}
-        >
-          <DialogTitle sx={{ fontSize: '1.3rem', fontWeight: 700, color: MAIN_COLOR_DARK }}>
-            Coming Soon
-          </DialogTitle>
-          <DialogContent>
-            <Typography sx={{ fontSize: '1.1rem', mt: 1 }}>
-              This feature is part of future scope and is not available yet.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setFutureScopeDialogOpen(false)} autoFocus>
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Content>
     </Container>
   );
