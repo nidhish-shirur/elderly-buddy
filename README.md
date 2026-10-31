@@ -113,6 +113,10 @@ The interface uses large controls, clear labels, high-contrast colors, and brows
   <img src="./UI%20screenshot%205" alt="Elderly Buddy screenshot 5" width="220">
 </p>
 
+### Demonstration Video
+
+- Family member picture uploading: https://youtu.be/Qi08Dhf3Tig
+
 ## Technology Stack
 
 | Area | Technology |
