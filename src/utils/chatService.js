@@ -12,7 +12,7 @@ console.log('Environment variables check:', {
 
 const OPENROUTER_API_KEY = process.env.REACT_APP_OPENROUTER_API_KEY;
 const WEATHER_API_KEY = '4c2b6a2ce113429da6234648252506';
-const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 // Add debugging for API key
 console.log('API Key check:', {
@@ -306,7 +306,7 @@ export const chatService = {
       ];
 
       const requestData = {
-        model: 'deepseek/deepseek-r1:free',
+        model: 'openai/gpt-oss-20b',
         messages: messages,
         temperature: 0.7,
         max_tokens: 2000,
